@@ -10,9 +10,11 @@
 </head>
 
 <body>
-    <button id="convert">出力</button>
-    <pre id="output"></pre>
-    <div id="editor_holder"></div>
+    <div class="container mt-4">
+        <div id="editor_holder" class="mb-4"></div>
+        <button id="convert" class="btn btn-primary mb-3">出力</button>
+        <pre id="output" class="border p-3"></pre>
+    </div>
 
     <script type="module">
         import { convertData } from './src/converter.js';
