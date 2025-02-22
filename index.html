@@ -91,7 +91,9 @@
                 // JSONエディタの初期化
                 const editor = new JSONEditor(document.getElementById('editor_holder'), {
                     schema: schema,
-                    theme: 'bootstrap4'
+                    theme: 'bootstrap4',
+                    disable_edit_json: true,
+                    disable_properties: true
                 });
 
                 // コピーボタンのイベントリスナー
