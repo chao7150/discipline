@@ -1,11 +1,11 @@
 {
-  "name": "daily-tasks",
+  "name": "discipline",
   "version": "1.0.0",
   "description": "日々のタスク管理と得点化システム",
   "type": "module",
   "scripts": {
-    "start": "node server.js",
-    "dev": "node server.js"
+    "start": "node scripts/server.js",
+    "dev": "node scripts/server.js"
   },
   "keywords": [
     "task-management",

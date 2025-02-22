@@ -33,6 +33,8 @@ http://localhost:3000
 ├── index.html          # メインのHTML
 ├── src/
 │   └── converter.js    # データ変換モジュール
+├── scripts/
+│   └── server.js       # 開発サーバー
 ├── schemas/
 │   └── tasklist.json   # JSONスキーマ定義
 └── example/
