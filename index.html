@@ -13,10 +13,52 @@
     <div class="container mt-4">
         <div id="editor_holder" class="mb-4"></div>
         <button id="convert" class="btn btn-primary mb-3">出力</button>
-        <pre id="output" class="border p-3"></pre>
+        
+        <div class="mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h6 class="mb-0">Markdown形式</h6>
+                <button id="copy" class="btn btn-outline-secondary btn-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clipboard" viewBox="0 0 16 16">
+                        <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1z"/>
+                        <path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0z"/>
+                    </svg>
+                    コピー
+                </button>
+            </div>
+            <pre id="markdown-output" class="border p-3"></pre>
+        </div>
+
+        <div>
+            <h6 class="mb-2">JSON形式</h6>
+            <pre id="json-output" class="border p-3"></pre>
+        </div>
     </div>
 
     <script type="module">
+        // Markdownテキストをクリップボードにコピーする関数
+        function copyMarkdown() {
+            const markdownContent = document.getElementById('markdown-output').textContent;
+            
+            navigator.clipboard.writeText(markdownContent).then(() => {
+                const copyBtn = document.getElementById('copy');
+                copyBtn.innerHTML = '✓ コピーしました';
+                copyBtn.classList.remove('btn-outline-secondary');
+                copyBtn.classList.add('btn-success');
+                
+                setTimeout(() => {
+                    copyBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clipboard" viewBox="0 0 16 16">
+                        <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1z"/>
+                        <path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0z"/>
+                    </svg> コピー`;
+                    copyBtn.classList.remove('btn-success');
+                    copyBtn.classList.add('btn-outline-secondary');
+                }, 2000);
+            }).catch(err => {
+                console.error('クリップボードへのコピーに失敗しました:', err);
+                alert('クリップボードへのコピーに失敗しました');
+            });
+        }
+
         import { convertData } from './src/converter.js';
 
         // スキーマの読み込み
@@ -29,14 +71,19 @@
                     theme: 'bootstrap4'
                 });
 
+                // コピーボタンのイベントリスナー
+                document.getElementById('copy').addEventListener('click', copyMarkdown);
+
                 // 変換ボタンのイベントリスナー
                 document.getElementById('convert').addEventListener('click', () => {
                     const data = editor.getValue();
                     const result = convertData(data);
                     
-                    // 両方の形式を同時に出力
-                    document.getElementById('output').textContent = 
-                        `# Markdown形式\n${result.markdown}\n\n# JSON形式\n${JSON.stringify(result.json, null, 2)}`;
+                    // Markdown形式の出力
+                    document.getElementById('markdown-output').textContent = result.markdown;
+                    
+                    // JSON形式の出力
+                    document.getElementById('json-output').textContent = JSON.stringify(result.json, null, 2);
                 });
             })
             .catch(error => {
