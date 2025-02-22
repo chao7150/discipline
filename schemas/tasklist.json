@@ -71,10 +71,10 @@
       "労働": {
         "type": "object",
         "properties": {
-          "質": {
+          "passion": {
             "type": "integer"
           },
-          "自己管理": {
+          "discipline": {
             "type": "integer"
           },
           "備考": {
@@ -82,8 +82,8 @@
           }
         },
         "required": [
-          "質",
-          "自己管理",
+          "passion",
+          "discipline",
           "備考"
         ]
       },

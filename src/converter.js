@@ -120,7 +120,7 @@ function calculateScore(項目, データ) {
 
     case "労働":
       // 質と自己管理の平均点
-      return Math.round((データ.質 + データ.自己管理) / 2);
+      return Math.round((データ.passion + データ.discipline) / 2);
 
     case "ジム":
       // サボった以外は100点
@@ -175,7 +175,7 @@ function convertToMarkdown(items, totalScore) {
         break;
 
       case "労働":
-        text = `仕事の質は${データ.質}点、自己管理は${データ.自己管理}点（${データ.備考}）`;
+        text = `passion: ${データ.passion}点, discipline: ${データ.discipline}点（${データ.備考}）`;
         score = calculateScore(項目, データ);
         break;
 
