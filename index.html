@@ -10,11 +10,13 @@
 </head>
 
 <body>
-    <button id="convert">Markdownに変換</button>
+    <button id="convert">出力</button>
     <pre id="output"></pre>
     <div id="editor_holder"></div>
 
-    <script>
+    <script type="module">
+        import { convertData } from './src/converter.js';
+
         // スキーマの読み込み
         fetch('schemas/tasklist.json')
             .then(response => response.json())
@@ -28,45 +30,16 @@
                 // 変換ボタンのイベントリスナー
                 document.getElementById('convert').addEventListener('click', () => {
                     const data = editor.getValue();
-                    const markdown = convertToMarkdown(data);
-                    document.getElementById('output').textContent = markdown;
+                    const result = convertData(data);
+                    
+                    // 両方の形式を同時に出力
+                    document.getElementById('output').textContent = 
+                        `# Markdown形式\n${result.markdown}\n\n# JSON形式\n${JSON.stringify(result.json, null, 2)}`;
                 });
+            })
+            .catch(error => {
+                console.error('スキーマの読み込みに失敗しました:', error);
             });
-
-        // JSONデータをMarkdown表形式に変換する関数
-        function convertToMarkdown(data) {
-            let markdown = '| 項目 | 得点 |\n| ---- | ---- |\n';
-
-            // 各項目の得点計算とテーブル行の追加
-            function calculateScore(value) {
-                if (typeof value === 'boolean') {
-                    return value ? 100 : 0;
-                }
-                if (typeof value === 'object') {
-                    if (Array.isArray(value)) {
-                        return value.reduce((sum, item) => sum + (item.得点 || 0), 0);
-                    }
-                    // オブジェクトの場合は全てのプロパティが必須値を満たしていれば100点
-                    return Object.values(value).every(v => v !== undefined && v !== null) ? 100 : 0;
-                }
-                return 0;
-            }
-
-            // 必須項目の処理
-            ['起床', '散歩', '朝食', '体操', '労働', 'ジム', '勉強会', '個人開発', '歯磨き'].forEach(item => {
-                const score = calculateScore(data[item]);
-                markdown += `| ${item} | ${score} |\n`;
-            });
-
-            // その他の項目の処理（配列）
-            if (data.その他 && Array.isArray(data.その他)) {
-                data.その他.forEach(item => {
-                    markdown += `| ${item.題目} | ${item.得点} |\n`;
-                });
-            }
-
-            return markdown;
-        }
     </script>
 </body>
 

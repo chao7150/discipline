@@ -1,28 +1,54 @@
 /**
- * Markdownテーブル変換モジュール
+ * データ変換モジュール
  */
 
 /**
- * JSONデータをMarkdown表形式に変換する
+ * 入力データを整形された形式に変換する
  * @param {Object} data - 変換するJSONデータ
- * @returns {string} Markdown形式の文字列
+ * @returns {Object} 変換結果（markdown形式とjson形式）
  */
-export function convertToMarkdown(data) {
-    let markdown = '| 項目 | 得点 |\n| ---- | ---- |\n';
-
-    // 必須項目の処理
+export function convertData(data) {
     const requiredItems = ['起床', '散歩', '朝食', '体操', '労働', 'ジム', '勉強会', '個人開発', '歯磨き'];
-    requiredItems.forEach(item => {
-        const score = calculateScore(data[item]);
-        markdown += `| ${item} | ${score} |\n`;
-    });
+    
+    // スコア計算と整形されたデータの作成
+    const formattedData = requiredItems.map(item => ({
+        項目: item,
+        得点: calculateScore(data[item])
+    }));
 
-    // その他の項目の処理
+    // その他の項目の追加
     if (data.その他 && Array.isArray(data.その他)) {
         data.その他.forEach(item => {
-            markdown += `| ${item.題目} | ${item.得点} |\n`;
+            formattedData.push({
+                項目: item.題目,
+                得点: item.得点
+            });
         });
     }
+
+    // 合計得点の計算
+    const totalScore = formattedData.reduce((sum, item) => sum + item.得点, 0);
+
+    return {
+        markdown: convertToMarkdown(formattedData),
+        json: {
+            items: formattedData,
+            totalScore
+        }
+    };
+}
+
+/**
+ * データをMarkdown表形式に変換する
+ * @param {Array} items - 変換するデータ配列
+ * @returns {string} Markdown形式の文字列
+ */
+function convertToMarkdown(items) {
+    let markdown = '| 項目 | 得点 |\n| ---- | ---- |\n';
+    
+    items.forEach(item => {
+        markdown += `| ${item.項目} | ${item.得点} |\n`;
+    });
 
     return markdown;
 }
