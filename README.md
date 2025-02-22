@@ -44,3 +44,7 @@ http://localhost:3000
 - Node.js (開発サーバー)
 - [JSON Editor](https://github.com/json-editor/json-editor)
 - ES Modules
+
+### 開発ツール
+
+このプロジェクトは [Cline](https://github.com/saoudrizwan/cline) + [Claude](https://www.anthropic.com/claude) を使用して開発されました。
