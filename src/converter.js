@@ -186,7 +186,7 @@ function convertToMarkdown(items, totalScore) {
 
       case "勉強会":
       case "個人開発":
-        text = `${項目}を${データ ? "行った" : "行わなかった"}`;
+        text = データ ? "実施" : "ノー";
         score = calculateScore(項目, データ);
         break;
 
