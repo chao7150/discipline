@@ -169,11 +169,6 @@ function convertToMarkdown(items, totalScore) {
         score = calculateScore(項目, データ);
         break;
 
-      case "体操":
-        text = データ ? "体操した" : "体操しなかった";
-        score = calculateScore(項目, データ);
-        break;
-
       case "労働":
         text = `passion: ${データ.passion}点, discipline: ${データ.discipline}点（${データ.備考}）`;
         score = calculateScore(項目, データ);
@@ -184,6 +179,7 @@ function convertToMarkdown(items, totalScore) {
         score = calculateScore(項目, データ);
         break;
 
+      case "体操":
       case "勉強会":
       case "個人開発":
         text = データ ? "実施" : "ノー";
