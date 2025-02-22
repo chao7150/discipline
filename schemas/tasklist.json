@@ -1,0 +1,125 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "type": "object",
+    "properties": {
+      "起床": {
+        "type": "object",
+        "properties": {
+          "時刻": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "時刻"
+        ]
+      },
+      "散歩": {
+        "type": "object",
+        "properties": {
+          "犬": {
+            "type": "object",
+            "properties": {
+              "数": {
+                "type": "integer"
+              },
+              "備考": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "数",
+              "備考"
+            ]
+          }
+        },
+        "required": [
+          "犬"
+        ]
+      },
+      "朝食": {
+        "type": "object",
+        "properties": {
+          "含まれる栄養の色数": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "含まれる栄養の色数"
+        ]
+      },
+      "体操": {
+        "type": "boolean"
+      },
+      "労働": {
+        "type": "object",
+        "properties": {
+          "質": {
+            "type": "integer"
+          },
+          "自己管理": {
+            "type": "integer"
+          },
+          "備考": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "質",
+          "自己管理",
+          "備考"
+        ]
+      },
+      "ジム": {
+        "type": "object",
+        "properties": {
+          "スケジュールに従った": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "スケジュールに従った"
+        ]
+      },
+      "勉強会": {
+        "type": "boolean"
+      },
+      "個人開発": {
+        "type": "boolean"
+      },
+      "歯磨き": {
+        "type": "boolean"
+      },
+      "その他": {
+        "type": "array",
+        "items": [
+          {
+            "type": "object",
+            "properties": {
+              "題目": {
+                "type": "string"
+              },
+              "得点": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "題目",
+              "得点"
+            ]
+          }
+        ]
+      }
+    },
+    "required": [
+      "起床",
+      "散歩",
+      "朝食",
+      "体操",
+      "労働",
+      "ジム",
+      "勉強会",
+      "個人開発",
+      "歯磨き",
+      "その他"
+    ]
+  }
