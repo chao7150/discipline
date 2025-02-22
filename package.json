@@ -1,20 +1,17 @@
 {
-  "dependencies": {
-    "@json-editor/json-editor": "^2.15.2",
-    "@rjsf/core": "^5.24.3",
-    "@rjsf/utils": "^5.24.3"
-  },
   "name": "daily-tasks",
   "version": "1.0.0",
-  "main": "index.js",
-  "directories": {
-    "example": "example"
-  },
+  "description": "日々のタスク管理と得点化システム",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server.js",
+    "dev": "node server.js"
   },
-  "keywords": [],
+  "keywords": [
+    "task-management",
+    "daily-tasks",
+    "scoring-system"
+  ],
   "author": "",
-  "license": "ISC",
-  "description": ""
+  "license": "MIT"
 }
