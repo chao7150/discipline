@@ -26,7 +26,13 @@
       "散歩": {
         "type": "object",
         "properties": {
-          "犬": {
+          "実施": {
+            "type": "boolean"
+          },
+          "ゴミ拾い": {
+            "type": "boolean"
+          },
+          "犬遭遇": {
             "type": "object",
             "properties": {
               "数": {
@@ -43,7 +49,9 @@
           }
         },
         "required": [
-          "犬"
+          "実施",
+          "ゴミ拾い",
+          "犬遭遇"
         ]
       },
       "朝食": {

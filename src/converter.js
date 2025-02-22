@@ -81,15 +81,21 @@ export function convertData(data) {
 function calculateScore(項目, データ) {
     switch (項目) {
         case '起床': {
-            // 5時=100点、12時=0点で線形計算
+            // 8時以前=100点、8時から10時までで線形減少
             const 時間 = データ.時 + データ.分 / 60;
-            const score = Math.max(0, Math.min(100, (12 - 時間) * (100 / 7)));
-            return Math.round(score);
+            if (時間 <= 8) {
+                return 100;
+            } else if (時間 >= 10) {
+                return 0;
+            } else {
+                // 8時から10時までの2時間で100点から0点まで線形減少
+                return Math.round((10 - 時間) * 50); // (10-時間)/(10-8) * 100
+            }
         }
 
         case '散歩':
-            // 犬の数×20点（最大100点）
-            return Math.min(100, データ.犬.数 * 20);
+            // 実施で100点 + 犬遭遇数×10点（上限なし）
+            return データ.実施 ? (100 + データ.犬遭遇.数 * 10) : 0;
 
         case '朝食':
             // 栄養の色数×20点（最大100点）
@@ -134,12 +140,12 @@ function convertToMarkdown(items, totalScore) {
 
         switch (項目) {
             case '起床':
-                text = `${item.時}時${item.分}分に起床`;
+                text = `${item.時}:${item.分}`;
                 score = calculateScore(項目, item);
                 break;
 
             case '散歩':
-                text = `犬${データ.犬.数}匹と散歩（${データ.犬.備考}）`;
+                text = `${データ.実施 ? '実施' : '未実施'}${データ.ゴミ拾い ? '・ゴミ拾いあり' : ''}・犬${データ.犬遭遇.数}匹（${データ.犬遭遇.備考}）`;
                 score = calculateScore(項目, データ);
                 break;
 
