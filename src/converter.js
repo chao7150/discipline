@@ -48,13 +48,13 @@ export function convertData(data) {
   // 総合点の計算
   const weights = {
     起床: 0.15,
-    散歩: 0.10,
+    散歩: 0.1,
     朝食: 0.15,
-    体操: 0.10,
+    体操: 0.1,
     労働: 0.25,
-    ジム: 0.10,
+    ジム: 0.1,
     勉強会: 0.05,
-    個人開発: 0.10,
+    個人開発: 0.1,
   };
 
   const scores = formattedData.map((item) => {
@@ -123,8 +123,8 @@ function calculateScore(項目, データ) {
       return Math.round((データ.質 + データ.自己管理) / 2);
 
     case "ジム":
-      // スケジュール通りなら100点、サボりで0点
-      return データ.スケジュールに従った ? 100 : 0;
+      // サボった以外は100点
+      return データ === "サボった" ? 0 : 100;
 
     case "勉強会":
     case "個人開発":
@@ -180,9 +180,7 @@ function convertToMarkdown(items, totalScore) {
         break;
 
       case "ジム":
-        text = データ.スケジュールに従った
-          ? "予定通りジムで運動"
-          : "ジムをサボった";
+        text = データ;
         score = calculateScore(項目, データ);
         break;
 

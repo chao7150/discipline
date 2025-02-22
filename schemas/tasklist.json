@@ -88,15 +88,8 @@
         ]
       },
       "ジム": {
-        "type": "object",
-        "properties": {
-          "スケジュールに従った": {
-            "type": "boolean"
-          }
-        },
-        "required": [
-          "スケジュールに従った"
-        ]
+        "type": "string",
+        "enum": ["有酸素+筋トレ", "有酸素", "休養日", "サボった"]
       },
       "勉強会": {
         "type": "boolean"
