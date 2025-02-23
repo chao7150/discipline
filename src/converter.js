@@ -67,13 +67,10 @@ export function convertData(data) {
   };
 
   const scores = formattedData.map((item) => {
-    if (item.項目 === "起床") {
-      return calculateScore(item.項目, item) * weights[item.項目];
-    }
-    if (item.項目 === "あすけんの点数") {
-      return item.データ;
-    }
-    return calculateScore(item.項目, item.データ) * (weights[item.項目] || 0);
+    const score = item.項目 === "あすけんの点数" ? item.データ :
+                 item.項目 === "起床" ? calculateScore(item.項目, item) :
+                 calculateScore(item.項目, item.データ);
+    return score * (weights[item.項目] || 0);
   });
 
   // 重みの合計を計算
@@ -83,7 +80,7 @@ export function convertData(data) {
   );
 
   const totalScore = Math.round(
-    (scores.reduce((sum, score) => sum + score, 0) / totalWeight) * 100
+    scores.reduce((sum, score) => sum + score, 0) / totalWeight
   );
 
   return {
