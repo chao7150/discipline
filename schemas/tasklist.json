@@ -94,26 +94,6 @@
       "あすけんの点数": {
         "type": "number",
         "description": "あすけんの点数"
-      },
-      "その他": {
-        "type": "array",
-        "items": [
-          {
-            "type": "object",
-            "properties": {
-              "題目": {
-                "type": "string"
-              },
-              "得点": {
-                "type": "integer"
-              }
-            },
-            "required": [
-              "題目",
-              "得点"
-            ]
-          }
-        ]
       }
     },
     "required": [
@@ -124,7 +104,6 @@
       "労働",
       "ジム",
       "勉強会",
-      "個人開発",
-      "その他"
+      "個人開発"
     ]
-  }
+}

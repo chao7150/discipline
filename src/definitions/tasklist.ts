@@ -27,12 +27,4 @@ export interface TaskList {
    * あすけんの点数
    */
   あすけんの点数?: number;
-  その他:
-    | []
-    | [
-        {
-          題目: string;
-          得点: number;
-        }
-      ];
 }

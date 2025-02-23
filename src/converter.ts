@@ -2,6 +2,8 @@
  * データ変換モジュール
  */
 
+import { TaskList } from "./definitions/tasklist";
+
 interface TaskData {
   起床: {
     時: number;
@@ -27,15 +29,11 @@ interface TaskData {
   ジム: string;
   勉強会: boolean;
   個人開発: boolean;
-  その他?: Array<{
-    題目: string;
-    得点: number;
-  }>;
   あすけんの点数?: number;
 }
 
 interface FormattedItem {
-  項目: string;
+  項目: keyof TaskList;
   時?: number;
   分?: number;
   データ?: any;
@@ -83,16 +81,6 @@ export function convertData(data: TaskData): ConversionResult {
     }
   });
 
-  // その他の項目の追加
-  if (data.その他 && Array.isArray(data.その他)) {
-    data.その他.forEach((item) => {
-      formattedData.push({
-        項目: item.題目,
-        データ: item,
-      });
-    });
-  }
-
   // あすけんの点数を追加
   if (data.あすけんの点数 !== undefined) {
     formattedData.push({
@@ -102,7 +90,7 @@ export function convertData(data: TaskData): ConversionResult {
   }
 
   // 総合点の計算
-  const weights: { [key: string]: number } = {
+  const weights: Record<keyof TaskList, number> = {
     起床: 20,
     散歩: 10,
     朝食: 15,
@@ -119,8 +107,8 @@ export function convertData(data: TaskData): ConversionResult {
       item.項目 === "あすけんの点数"
         ? item.データ
         : item.項目 === "起床"
-        ? calculateScore(item.項目, item)
-        : calculateScore(item.項目, item.データ);
+          ? calculateScore(item.項目, item)
+          : calculateScore(item.項目, item.データ);
     return score * (weights[item.項目] || 0);
   });
 
@@ -196,8 +184,7 @@ function calculateScore(項目: string, データ: any): number {
       return データ ? 100 : 0;
 
     default:
-      // その他の項目は入力された得点をそのまま使用
-      return データ.得点;
+      return 0;
   }
 }
 
@@ -253,11 +240,6 @@ function convertToMarkdown(items: FormattedItem[], totalScore: number): string {
       case "あすけんの点数":
         text = "-";
         score = データ;
-        break;
-
-      default:
-        text = データ.題目;
-        score = データ.得点;
         break;
     }
 
