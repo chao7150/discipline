@@ -6,16 +6,10 @@
         "type": "object",
         "properties": {
           "時": {
-            "type": "integer",
-            "minimum": 0,
-            "maximum": 23,
-            "title": "時"
+            "type": "integer"
           },
           "分": {
-            "type": "integer",
-            "minimum": 0,
-            "maximum": 59,
-            "title": "分"
+            "type": "integer"
           }
         },
         "required": [
