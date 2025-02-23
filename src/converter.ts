@@ -23,7 +23,7 @@ interface ConversionResult {
 }
 
 const 起床Formatter: Formattable<"起床"> = {
-  文言を得る: (データ) => `${データ.時}:${データ.分}`,
+  文言を得る: (データ) => `${データ.時}:${String(データ.分).padStart(2, "0")}`,
   点数を得る: (データ) => {
     const 時間 = データ.時 + データ.分 / 60;
     if (時間 <= 8) return 100;
@@ -33,10 +33,12 @@ const 起床Formatter: Formattable<"起床"> = {
 };
 
 const 散歩Formatter: Formattable<"散歩"> = {
-  文言を得る: (データ) =>
-    `${データ.実施 ? "実施" : "未実施"}${
-      データ.ゴミ拾い ? "・ゴミ拾いあり" : ""
-    }・犬${データ.犬遭遇.数}匹（${データ.犬遭遇.備考}）`,
+  文言を得る: (データ) => {
+    if (!データ.実施) {
+      return "未実施";
+    }
+    return `実施・${データ.ゴミ拾い ? "・ゴミ拾いあり" : "ゴミ拾いなし"}・犬遭遇${データ.犬遭遇.数}匹（${データ.犬遭遇.備考}）`;
+  },
   点数を得る: (データ) => (データ.実施 ? 100 + データ.犬遭遇.数 * 10 : 0),
 };
 
@@ -68,7 +70,7 @@ const ジムFormatter: Formattable<"ジム"> = {
 };
 
 const 勉強会Formatter: Formattable<"勉強会"> = {
-  文言を得る: (データ) => (データ ? "実施" : "ノー"),
+  文言を得る: (データ) => (データ ? "参加" : "ノー"),
   点数を得る: (データ) => (データ ? 100 : 0),
 };
 
@@ -82,7 +84,7 @@ const あすけんの点数Formatter: Formattable<"あすけんの点数"> = {
   点数を得る: (データ) => データ ?? 0,
 };
 
-const formatters: { [K in keyof TaskList]: Formattable<K> } = {
+const formatters = {
   起床: 起床Formatter,
   散歩: 散歩Formatter,
   朝食: 朝食Formatter,
@@ -92,7 +94,7 @@ const formatters: { [K in keyof TaskList]: Formattable<K> } = {
   勉強会: 勉強会Formatter,
   個人開発: 個人開発Formatter,
   あすけんの点数: あすけんの点数Formatter,
-};
+} as const;
 
 /**
  * 入力データを整形された形式に変換する
@@ -120,15 +122,15 @@ export function convertData(data: TaskList): ConversionResult {
 
   // 総合点の計算
   const weights: Record<keyof TaskList, number> = {
-    起床: 20,
-    散歩: 10,
-    朝食: 15,
-    体操: 5,
-    労働: 40,
-    ジム: 20,
-    勉強会: 20,
-    個人開発: 10,
-    あすけんの点数: 15,
+    起床: 13,
+    散歩: 6,
+    朝食: 10,
+    体操: 3,
+    労働: 26,
+    ジム: 13,
+    勉強会: 13,
+    個人開発: 6,
+    あすけんの点数: 10,
   };
 
   const scores = formattedData.map((item) => {
