@@ -23,8 +23,5 @@ export interface TaskList {
   ジム: '有酸素+筋トレ' | '有酸素' | '休養日' | 'サボった';
   勉強会: boolean;
   個人開発: boolean;
-  /**
-   * あすけんの点数
-   */
-  あすけんの点数: number;
+  あすけん: number;
 }

@@ -79,7 +79,7 @@ const 個人開発Formatter: Formattable<"個人開発"> = {
   点数を得る: (データ) => (データ ? 100 : 0),
 };
 
-const あすけんの点数Formatter: Formattable<"あすけんの点数"> = {
+const あすけんFormatter: Formattable<"あすけん"> = {
   文言を得る: () => "-",
   点数を得る: (データ) => データ ?? 0,
 };
@@ -93,7 +93,7 @@ const formatters = {
   ジム: ジムFormatter,
   勉強会: 勉強会Formatter,
   個人開発: 個人開発Formatter,
-  あすけんの点数: あすけんの点数Formatter,
+  あすけん: あすけんFormatter,
 } as const;
 
 /**
@@ -111,7 +111,7 @@ export function convertData(data: TaskList): ConversionResult {
     "ジム",
     "勉強会",
     "個人開発",
-    "あすけんの点数",
+    "あすけん",
   ] as const;
 
   // データの整形
@@ -130,7 +130,7 @@ export function convertData(data: TaskList): ConversionResult {
     ジム: 13,
     勉強会: 13,
     個人開発: 6,
-    あすけんの点数: 10,
+    あすけん: 10,
   };
 
   const scores = formattedData.map((item) => {

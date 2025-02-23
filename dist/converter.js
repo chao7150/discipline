@@ -15,7 +15,7 @@ const 起床Formatter = {
 const 散歩Formatter = {
     文言を得る: (データ) => {
         if (!データ.実施) {
-            return "未実施";
+            return "ノー";
         }
         return `実施・${データ.ゴミ拾い ? "・ゴミ拾いあり" : "ゴミ拾いなし"}・犬遭遇${データ.犬遭遇.数}匹（${データ.犬遭遇.備考}）`;
     },
@@ -54,7 +54,7 @@ const 個人開発Formatter = {
     文言を得る: (データ) => (データ ? "実施" : "ノー"),
     点数を得る: (データ) => (データ ? 100 : 0),
 };
-const あすけんの点数Formatter = {
+const あすけんFormatter = {
     文言を得る: () => "-",
     点数を得る: (データ) => データ ?? 0,
 };
@@ -67,7 +67,7 @@ const formatters = {
     ジム: ジムFormatter,
     勉強会: 勉強会Formatter,
     個人開発: 個人開発Formatter,
-    あすけんの点数: あすけんの点数Formatter,
+    あすけん: あすけんFormatter,
 };
 /**
  * 入力データを整形された形式に変換する
@@ -84,7 +84,7 @@ export function convertData(data) {
         "ジム",
         "勉強会",
         "個人開発",
-        "あすけんの点数",
+        "あすけん",
     ];
     // データの整形
     const formattedData = requiredItems.map((item) => ({
@@ -101,7 +101,7 @@ export function convertData(data) {
         ジム: 13,
         勉強会: 13,
         個人開発: 6,
-        あすけんの点数: 10,
+        あすけん: 10,
     };
     const scores = formattedData.map((item) => {
         const formatter = formatters[item.題目];
