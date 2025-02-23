@@ -109,6 +109,7 @@ export function convertData(data: TaskList): ConversionResult {
     "ジム",
     "勉強会",
     "個人開発",
+    "あすけんの点数",
   ] as const;
 
   // データの整形
@@ -116,14 +117,6 @@ export function convertData(data: TaskList): ConversionResult {
     題目: item,
     データ: data[item],
   }));
-
-  // あすけんの点数を追加
-  if (data.あすけんの点数 !== undefined) {
-    formattedData.push({
-      題目: "あすけんの点数",
-      データ: data.あすけんの点数,
-    });
-  }
 
   // 総合点の計算
   const weights: Record<keyof TaskList, number> = {

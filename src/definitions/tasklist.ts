@@ -26,5 +26,5 @@ export interface TaskList {
   /**
    * あすけんの点数
    */
-  あすけんの点数?: number;
+  あすけんの点数: number;
 }
