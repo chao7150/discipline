@@ -45,26 +45,46 @@ export function convertData(data) {
     });
   }
 
+  // あすけんの点数を追加
+  if (data.あすけんの点数 !== undefined) {
+    formattedData.push({
+      項目: "あすけんの点数",
+      データ: data.あすけんの点数,
+    });
+  }
+
   // 総合点の計算
   const weights = {
-    起床: 0.14,
-    散歩: 0.07,
-    朝食: 0.14,
-    体操: 0.03,
-    労働: 0.28,
-    ジム: 0.14,
-    勉強会: 0.14,
-    個人開発: 0.07,
+    起床: 20,
+    散歩: 10,
+    朝食: 15,
+    体操: 5,
+    労働: 40,
+    ジム: 20,
+    勉強会: 20,
+    個人開発: 10,
+    あすけんの点数: 15,
   };
 
   const scores = formattedData.map((item) => {
     if (item.項目 === "起床") {
       return calculateScore(item.項目, item) * weights[item.項目];
     }
+    if (item.項目 === "あすけんの点数") {
+      return item.データ;
+    }
     return calculateScore(item.項目, item.データ) * (weights[item.項目] || 0);
   });
 
-  const totalScore = Math.round(scores.reduce((sum, score) => sum + score, 0));
+  // 重みの合計を計算
+  const totalWeight = Object.values(weights).reduce(
+    (sum, weight) => sum + weight,
+    0
+  );
+
+  const totalScore = Math.round(
+    (scores.reduce((sum, score) => sum + score, 0) / totalWeight) * 100
+  );
 
   return {
     markdown: convertToMarkdown(formattedData, totalScore),
@@ -184,6 +204,11 @@ function convertToMarkdown(items, totalScore) {
       case "個人開発":
         text = データ ? "実施" : "ノー";
         score = calculateScore(項目, データ);
+        break;
+
+      case "あすけんの点数":
+        text = "-";
+        score = データ;
         break;
 
       default:

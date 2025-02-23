@@ -97,6 +97,10 @@
       "個人開発": {
         "type": "boolean"
       },
+      "あすけんの点数": {
+        "type": "number",
+        "description": "あすけんの点数"
+      },
       "その他": {
         "type": "array",
         "items": [
