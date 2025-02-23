@@ -2,13 +2,60 @@
  * データ変換モジュール
  */
 
+interface TaskData {
+  起床: {
+    時: number;
+    分: number;
+  };
+  散歩: {
+    実施: boolean;
+    ゴミ拾い: boolean;
+    犬遭遇: {
+      数: number;
+      備考: string;
+    };
+  };
+  朝食: {
+    三色食品群のうち: number;
+  };
+  体操: boolean;
+  労働: {
+    passion: number;
+    discipline: number;
+    備考: string;
+  };
+  ジム: string;
+  勉強会: boolean;
+  個人開発: boolean;
+  その他?: Array<{
+    題目: string;
+    得点: number;
+  }>;
+  あすけんの点数?: number;
+}
+
+interface FormattedItem {
+  項目: string;
+  時?: number;
+  分?: number;
+  データ?: any;
+}
+
+interface ConversionResult {
+  markdown: string;
+  json: {
+    items: FormattedItem[];
+    totalScore: number;
+  };
+}
+
 /**
  * 入力データを整形された形式に変換する
- * @param {Object} data - 変換するJSONデータ
- * @returns {Object} 変換結果（markdown形式とjson形式）
+ * @param {TaskData} data - 変換するJSONデータ
+ * @returns {ConversionResult} 変換結果（markdown形式とjson形式）
  */
-export function convertData(data) {
-  const requiredItems = [
+export function convertData(data: TaskData): ConversionResult {
+  const requiredItems: (keyof TaskData)[] = [
     "起床",
     "散歩",
     "朝食",
@@ -20,12 +67,13 @@ export function convertData(data) {
   ];
 
   // データの整形
-  const formattedData = requiredItems.map((item) => {
+  const formattedData: FormattedItem[] = requiredItems.map((item) => {
     if (item === "起床") {
+      const 起床データ = data.起床;
       return {
         項目: item,
-        時: data[item].時,
-        分: data[item].分,
+        時: 起床データ.時,
+        分: 起床データ.分,
       };
     } else {
       return {
@@ -54,7 +102,7 @@ export function convertData(data) {
   }
 
   // 総合点の計算
-  const weights = {
+  const weights: { [key: string]: number } = {
     起床: 20,
     散歩: 10,
     朝食: 15,
@@ -66,20 +114,23 @@ export function convertData(data) {
     あすけんの点数: 15,
   };
 
-  const scores = formattedData.map((item) => {
-    const score = item.項目 === "あすけんの点数" ? item.データ :
-                 item.項目 === "起床" ? calculateScore(item.項目, item) :
-                 calculateScore(item.項目, item.データ);
+  const scores: number[] = formattedData.map((item) => {
+    const score =
+      item.項目 === "あすけんの点数"
+        ? item.データ
+        : item.項目 === "起床"
+        ? calculateScore(item.項目, item)
+        : calculateScore(item.項目, item.データ);
     return score * (weights[item.項目] || 0);
   });
 
   // 重みの合計を計算
-  const totalWeight = Object.values(weights).reduce(
+  const totalWeight: number = Object.values(weights).reduce(
     (sum, weight) => sum + weight,
     0
   );
 
-  const totalScore = Math.round(
+  const totalScore: number = Math.round(
     scores.reduce((sum, score) => sum + score, 0) / totalWeight
   );
 
@@ -93,17 +144,12 @@ export function convertData(data) {
 }
 
 /**
- * データをMarkdown文章形式に変換する
- * @param {Array} items - 変換するデータ配列
- * @returns {string} Markdown形式の文字列
- */
-/**
  * 項目ごとの得点を計算する
  * @param {string} 項目 - 項目名
- * @param {Object} データ - 項目のデータ
+ * @param {any} データ - 項目のデータ
  * @returns {number} 計算された得点
  */
-function calculateScore(項目, データ) {
+function calculateScore(項目: string, データ: any): number {
   switch (項目) {
     case "起床": {
       // 8時以前=100点、8時から10時までで線形減少
@@ -157,10 +203,11 @@ function calculateScore(項目, データ) {
 
 /**
  * データをMarkdown表形式に変換する
- * @param {Array} items - 変換するデータ配列
+ * @param {FormattedItem[]} items - 変換するデータ配列
+ * @param {number} totalScore - 総合点
  * @returns {string} Markdown形式の文字列
  */
-function convertToMarkdown(items, totalScore) {
+function convertToMarkdown(items: FormattedItem[], totalScore: number): string {
   let markdown = "| 項目 | 内容 | 得点 |\n| ---- | ---- | ---- |\n";
 
   items.forEach((item) => {
