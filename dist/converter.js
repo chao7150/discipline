@@ -1,9 +1,72 @@
 /**
  * データ変換モジュール
  */
+const 起床Formatter = {
+    文言を得る: (データ) => `${データ.時}:${データ.分}`,
+    点数を得る: (データ) => {
+        const 時間 = データ.時 + データ.分 / 60;
+        if (時間 <= 8)
+            return 100;
+        if (時間 >= 10)
+            return 0;
+        return Math.round((10 - 時間) * 50);
+    },
+};
+const 散歩Formatter = {
+    文言を得る: (データ) => `${データ.実施 ? "実施" : "未実施"}${データ.ゴミ拾い ? "・ゴミ拾いあり" : ""}・犬${データ.犬遭遇.数}匹（${データ.犬遭遇.備考}）`,
+    点数を得る: (データ) => (データ.実施 ? 100 + データ.犬遭遇.数 * 10 : 0),
+};
+const 朝食Formatter = {
+    文言を得る: (データ) => `三色食品群のうち${データ.三色食品群のうち}色カバー`,
+    点数を得る: (データ) => {
+        const 色数 = データ.三色食品群のうち;
+        if (色数 === 0)
+            return 0;
+        if (色数 === 1)
+            return 60;
+        if (色数 === 2)
+            return 80;
+        return 100;
+    },
+};
+const 体操Formatter = {
+    文言を得る: (データ) => (データ ? "実施" : "ノー"),
+    点数を得る: (データ) => (データ ? 100 : 0),
+};
+const 労働Formatter = {
+    文言を得る: (データ) => `passion: ${データ.passion}点, discipline: ${データ.discipline}点（${データ.備考}）`,
+    点数を得る: (データ) => Math.round((データ.passion + データ.discipline) / 2),
+};
+const ジムFormatter = {
+    文言を得る: (データ) => データ,
+    点数を得る: (データ) => (データ === "サボった" ? 0 : 100),
+};
+const 勉強会Formatter = {
+    文言を得る: (データ) => (データ ? "実施" : "ノー"),
+    点数を得る: (データ) => (データ ? 100 : 0),
+};
+const 個人開発Formatter = {
+    文言を得る: (データ) => (データ ? "実施" : "ノー"),
+    点数を得る: (データ) => (データ ? 100 : 0),
+};
+const あすけんの点数Formatter = {
+    文言を得る: () => "-",
+    点数を得る: (データ) => データ ?? 0,
+};
+const formatters = {
+    起床: 起床Formatter,
+    散歩: 散歩Formatter,
+    朝食: 朝食Formatter,
+    体操: 体操Formatter,
+    労働: 労働Formatter,
+    ジム: ジムFormatter,
+    勉強会: 勉強会Formatter,
+    個人開発: 個人開発Formatter,
+    あすけんの点数: あすけんの点数Formatter,
+};
 /**
  * 入力データを整形された形式に変換する
- * @param {TaskData} data - 変換するJSONデータ
+ * @param {TaskList} data - 変換するJSONデータ
  * @returns {ConversionResult} 変換結果（markdown形式とjson形式）
  */
 export function convertData(data) {
@@ -16,40 +79,13 @@ export function convertData(data) {
         "ジム",
         "勉強会",
         "個人開発",
+        "あすけんの点数",
     ];
     // データの整形
-    const formattedData = requiredItems.map((item) => {
-        if (item === "起床") {
-            const 起床データ = data.起床;
-            return {
-                項目: item,
-                時: 起床データ.時,
-                分: 起床データ.分,
-            };
-        }
-        else {
-            return {
-                項目: item,
-                データ: data[item],
-            };
-        }
-    });
-    // その他の項目の追加
-    if (data.その他 && Array.isArray(data.その他)) {
-        data.その他.forEach((item) => {
-            formattedData.push({
-                項目: item.題目,
-                データ: item,
-            });
-        });
-    }
-    // あすけんの点数を追加
-    if (data.あすけんの点数 !== undefined) {
-        formattedData.push({
-            項目: "あすけんの点数",
-            データ: data.あすけんの点数,
-        });
-    }
+    const formattedData = requiredItems.map((item) => ({
+        題目: item,
+        データ: data[item],
+    }));
     // 総合点の計算
     const weights = {
         起床: 20,
@@ -63,12 +99,9 @@ export function convertData(data) {
         あすけんの点数: 15,
     };
     const scores = formattedData.map((item) => {
-        const score = item.項目 === "あすけんの点数"
-            ? item.データ
-            : item.項目 === "起床"
-                ? calculateScore(item.項目, item)
-                : calculateScore(item.項目, item.データ);
-        return score * (weights[item.項目] || 0);
+        const formatter = formatters[item.題目];
+        const score = formatter.点数を得る(item.データ);
+        return score * weights[item.題目];
     });
     // 重みの合計を計算
     const totalWeight = Object.values(weights).reduce((sum, weight) => sum + weight, 0);
@@ -82,109 +115,18 @@ export function convertData(data) {
     };
 }
 /**
- * 項目ごとの得点を計算する
- * @param {string} 項目 - 項目名
- * @param {any} データ - 項目のデータ
- * @returns {number} 計算された得点
- */
-function calculateScore(項目, データ) {
-    switch (項目) {
-        case "起床": {
-            // 8時以前=100点、8時から10時までで線形減少
-            const 時間 = データ.時 + データ.分 / 60;
-            if (時間 <= 8) {
-                return 100;
-            }
-            else if (時間 >= 10) {
-                return 0;
-            }
-            else {
-                // 8時から10時までの2時間で100点から0点まで線形減少
-                return Math.round((10 - 時間) * 50); // (10-時間)/(10-8) * 100
-            }
-        }
-        case "散歩":
-            // 実施で100点 + 犬遭遇数×10点（上限なし）
-            return データ.実施 ? 100 + データ.犬遭遇.数 * 10 : 0;
-        case "朝食": {
-            // 色数に応じた点数（0色=0点、1色=60点、2色=80点、3色以上=100点）
-            const 色数 = データ.三色食品群のうち;
-            if (色数 === 0)
-                return 0;
-            if (色数 === 1)
-                return 60;
-            if (色数 === 2)
-                return 80;
-            return 100;
-        }
-        case "体操":
-            // 実施で100点、未実施で0点
-            return データ ? 100 : 0;
-        case "労働":
-            // 質と自己管理の平均点
-            return Math.round((データ.passion + データ.discipline) / 2);
-        case "ジム":
-            // サボった以外は100点
-            return データ === "サボった" ? 0 : 100;
-        case "勉強会":
-        case "個人開発":
-        case "歯磨き":
-            // 実施で100点、未実施で0点
-            return データ ? 100 : 0;
-        default:
-            // その他の項目は入力された得点をそのまま使用
-            return データ.得点;
-    }
-}
-/**
  * データをMarkdown表形式に変換する
- * @param {FormattedItem[]} items - 変換するデータ配列
+ * @param {Array<FormattedItem2<keyof TaskList>>} items - 変換するデータ配列
  * @param {number} totalScore - 総合点
  * @returns {string} Markdown形式の文字列
  */
 function convertToMarkdown(items, totalScore) {
     let markdown = "| 項目 | 内容 | 得点 |\n| ---- | ---- | ---- |\n";
     items.forEach((item) => {
-        const { 項目, データ } = item;
-        let text = "";
-        let score = 0;
-        switch (項目) {
-            case "起床":
-                text = `${item.時}:${item.分}`;
-                score = calculateScore(項目, item);
-                break;
-            case "散歩":
-                text = `${データ.実施 ? "実施" : "未実施"}${データ.ゴミ拾い ? "・ゴミ拾いあり" : ""}・犬${データ.犬遭遇.数}匹（${データ.犬遭遇.備考}）`;
-                score = calculateScore(項目, データ);
-                break;
-            case "朝食":
-                text = `三色食品群のうち${データ.三色食品群のうち}色カバー`;
-                score = calculateScore(項目, データ);
-                break;
-            case "労働":
-                text = `passion: ${データ.passion}点, discipline: ${データ.discipline}点（${データ.備考}）`;
-                score = calculateScore(項目, データ);
-                break;
-            case "ジム":
-                text = データ;
-                score = calculateScore(項目, データ);
-                break;
-            case "体操":
-            case "勉強会":
-            case "個人開発":
-                text = データ ? "実施" : "ノー";
-                score = calculateScore(項目, データ);
-                break;
-            case "あすけんの点数":
-                text = "-";
-                score = データ;
-                break;
-            default:
-                text = データ.題目;
-                score = データ.得点;
-                break;
-        }
-        markdown += `| ${項目} | ${text} | ${score} |\n`;
+        const formatter = formatters[item.題目];
+        const text = formatter.文言を得る(item.データ);
+        const score = formatter.点数を得る(item.データ);
+        markdown += `| ${item.題目} | ${text} | ${score} |\n`;
     });
     markdown += "| **総合** | **1日の総合評価** | **" + totalScore + "** |\n";
     return markdown;

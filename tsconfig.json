@@ -8,8 +8,9 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "outDir": "./dist",
-    "rootDir": "./src"
+    "rootDir": "./src",
+    "isolatedModules": true
   },
-  "include": ["src/**/*"],
+  "files": ["src/converter.ts"],
   "exclude": ["node_modules"]
 }

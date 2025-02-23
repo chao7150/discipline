@@ -92,8 +92,7 @@
         "type": "boolean"
       },
       "あすけんの点数": {
-        "type": "number",
-        "description": "あすけんの点数"
+        "type": "number"
       }
     },
     "required": [
