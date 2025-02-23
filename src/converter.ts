@@ -35,7 +35,7 @@ const 起床Formatter: Formattable<"起床"> = {
 const 散歩Formatter: Formattable<"散歩"> = {
   文言を得る: (データ) => {
     if (!データ.実施) {
-      return "未実施";
+      return "ノー";
     }
     return `実施・${データ.ゴミ拾い ? "・ゴミ拾いあり" : "ゴミ拾いなし"}・犬遭遇${データ.犬遭遇.数}匹（${データ.犬遭遇.備考}）`;
   },

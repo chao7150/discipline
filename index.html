@@ -84,10 +84,10 @@
             });
         }
 
-        import { convertData } from '/dist/converter.js';
+        import { convertData } from './dist/converter.js';
 
         // スキーマの読み込み
-        fetch('schemas/tasklist.json')
+        fetch('./schemas/tasklist.json')
             .then(response => response.json())
             .then(schema => {
                 // JSONエディタの初期化
