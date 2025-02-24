@@ -59,9 +59,18 @@ const 体操Formatter: Formattable<"体操"> = {
 };
 
 const 労働Formatter: Formattable<"労働"> = {
-  文言を得る: (データ) =>
-    `passion: ${データ.passion}点, discipline: ${データ.discipline}点（${データ.備考}）`,
-  点数を得る: (データ) => Math.round((データ.passion + データ.discipline) / 2),
+  文言を得る: (データ) => {
+    if (データ.状態 === "休日") {
+      return `休日${データ.備考 ? `（${データ.備考}）` : ""}`;
+    }
+    return `${データ.状態}・passion: ${データ.passion}点, discipline: ${データ.discipline}点（${データ.備考}）`;
+  },
+  点数を得る: (データ) => {
+    if (データ.状態 === "休日") {
+      return 100;
+    }
+    return Math.round((データ.passion + データ.discipline) / 2);
+  },
 };
 
 const ジムFormatter: Formattable<"ジム"> = {

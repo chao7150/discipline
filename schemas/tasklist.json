@@ -65,6 +65,10 @@
       "労働": {
         "type": "object",
         "properties": {
+          "状態": {
+            "type": "string",
+            "enum": ["した", "休日"]
+          },
           "passion": {
             "type": "integer"
           },
@@ -76,6 +80,7 @@
           }
         },
         "required": [
+          "状態",
           "passion",
           "discipline",
           "備考"

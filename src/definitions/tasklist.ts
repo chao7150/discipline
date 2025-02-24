@@ -16,6 +16,7 @@ export interface TaskList {
   };
   体操: boolean;
   労働: {
+    状態: 'した' | '休日';
     passion: number;
     discipline: number;
     備考: string;
