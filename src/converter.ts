@@ -42,10 +42,10 @@ const 散歩Formatter: Formattable<"散歩"> = {
   点数を得る: (データ) => (データ.実施 ? 100 + データ.犬遭遇.数 * 10 : 0),
 };
 
-const 朝食Formatter: Formattable<"朝食"> = {
-  文言を得る: (データ) => `三色食品群のうち${データ.三色食品群のうち}色カバー`,
+const 朝食の栄養カバレッジFormatter: Formattable<"朝食の栄養カバレッジ"> = {
+  文言を得る: (データ) => `${データ}色カバー`,
   点数を得る: (データ) => {
-    const 色数 = データ.三色食品群のうち;
+    const 色数 = Number(データ);
     if (色数 === 0) return 0;
     if (色数 === 1) return 60;
     if (色数 === 2) return 80;
@@ -96,7 +96,7 @@ const あすけんFormatter: Formattable<"あすけん"> = {
 const formatters = {
   起床: 起床Formatter,
   散歩: 散歩Formatter,
-  朝食: 朝食Formatter,
+  "朝食の栄養カバレッジ": 朝食の栄養カバレッジFormatter,
   体操: 体操Formatter,
   労働: 労働Formatter,
   ジム: ジムFormatter,
@@ -114,7 +114,7 @@ export function convertData(data: TaskList): ConversionResult {
   const requiredItems: Array<keyof TaskList> = [
     "起床",
     "散歩",
-    "朝食",
+    "朝食の栄養カバレッジ",
     "体操",
     "労働",
     "ジム",
@@ -133,7 +133,7 @@ export function convertData(data: TaskList): ConversionResult {
   const weights: Record<keyof TaskList, number> = {
     起床: 13,
     散歩: 6,
-    朝食: 10,
+    朝食の栄養カバレッジ: 10,
     体操: 3,
     労働: 26,
     ジム: 13,

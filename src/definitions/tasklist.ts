@@ -11,9 +11,7 @@ export interface TaskList {
       備考: string;
     };
   };
-  朝食: {
-    三色食品群のうち: number;
-  };
+  朝食の栄養カバレッジ: '0' | '1' | '2' | '3';
   体操: boolean;
   労働: {
     状態: 'した' | '休日';

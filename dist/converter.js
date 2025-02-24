@@ -21,10 +21,10 @@ const 散歩Formatter = {
     },
     点数を得る: (データ) => (データ.実施 ? 100 + データ.犬遭遇.数 * 10 : 0),
 };
-const 朝食Formatter = {
-    文言を得る: (データ) => `三色食品群のうち${データ.三色食品群のうち}色カバー`,
+const 朝食の栄養カバレッジFormatter = {
+    文言を得る: (データ) => `${データ}色カバー`,
     点数を得る: (データ) => {
-        const 色数 = データ.三色食品群のうち;
+        const 色数 = Number(データ);
         if (色数 === 0)
             return 0;
         if (色数 === 1)
@@ -39,8 +39,18 @@ const 体操Formatter = {
     点数を得る: (データ) => (データ ? 100 : 0),
 };
 const 労働Formatter = {
-    文言を得る: (データ) => `passion: ${データ.passion}点, discipline: ${データ.discipline}点（${データ.備考}）`,
-    点数を得る: (データ) => Math.round((データ.passion + データ.discipline) / 2),
+    文言を得る: (データ) => {
+        if (データ.状態 === "休日") {
+            return `休日${データ.備考 ? `（${データ.備考}）` : ""}`;
+        }
+        return `${データ.状態}・passion: ${データ.passion}点, discipline: ${データ.discipline}点（${データ.備考}）`;
+    },
+    点数を得る: (データ) => {
+        if (データ.状態 === "休日") {
+            return 100;
+        }
+        return Math.round((データ.passion + データ.discipline) / 2);
+    },
 };
 const ジムFormatter = {
     文言を得る: (データ) => データ,
@@ -61,7 +71,7 @@ const あすけんFormatter = {
 const formatters = {
     起床: 起床Formatter,
     散歩: 散歩Formatter,
-    朝食: 朝食Formatter,
+    "朝食の栄養カバレッジ": 朝食の栄養カバレッジFormatter,
     体操: 体操Formatter,
     労働: 労働Formatter,
     ジム: ジムFormatter,
@@ -78,7 +88,7 @@ export function convertData(data) {
     const requiredItems = [
         "起床",
         "散歩",
-        "朝食",
+        "朝食の栄養カバレッジ",
         "体操",
         "労働",
         "ジム",
@@ -95,7 +105,7 @@ export function convertData(data) {
     const weights = {
         起床: 13,
         散歩: 6,
-        朝食: 10,
+        朝食の栄養カバレッジ: 10,
         体操: 3,
         労働: 26,
         ジム: 13,
