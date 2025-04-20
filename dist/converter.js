@@ -1,7 +1,7 @@
 /**
  * データ変換モジュール
  */
-const 起床Formatter = {
+export const 起床Formatter = {
     文言を得る: (データ) => `${データ.時}:${String(データ.分).padStart(2, "0")}`,
     点数を得る: (データ) => {
         const 時間 = データ.時 + データ.分 / 60;
@@ -12,16 +12,16 @@ const 起床Formatter = {
         return Math.round((10 - 時間) * 50);
     },
 };
-const 散歩Formatter = {
+export const 散歩Formatter = {
     文言を得る: (データ) => {
         if (!データ.実施) {
             return "ノー";
         }
-        return `実施・${データ.ゴミ拾い ? "・ゴミ拾いあり" : "ゴミ拾いなし"}・犬遭遇${データ.犬遭遇.数}匹（${データ.犬遭遇.備考}）`;
+        return `実施・${データ.ゴミ拾い ? "ゴミ拾いあり" : "ゴミ拾いなし"}・犬遭遇${データ.犬遭遇.数}匹${データ.犬遭遇.備考 ? `（${データ.犬遭遇.備考}）` : ""}`;
     },
     点数を得る: (データ) => (データ.実施 ? 100 + データ.犬遭遇.数 * 10 : 0),
 };
-const 朝食の栄養カバレッジFormatter = {
+export const 朝食の栄養カバレッジFormatter = {
     文言を得る: (データ) => `${データ}色カバー`,
     点数を得る: (データ) => {
         const 色数 = Number(データ);
@@ -34,16 +34,16 @@ const 朝食の栄養カバレッジFormatter = {
         return 100;
     },
 };
-const 体操Formatter = {
+export const 体操Formatter = {
     文言を得る: (データ) => (データ ? "実施" : "ノー"),
     点数を得る: (データ) => (データ ? 100 : 0),
 };
-const 労働Formatter = {
+export const 労働Formatter = {
     文言を得る: (データ) => {
         if (データ.状態 === "休日") {
             return `休日${データ.備考 ? `（${データ.備考}）` : ""}`;
         }
-        return `${データ.状態}・passion: ${データ.passion}点, discipline: ${データ.discipline}点（${データ.備考}）`;
+        return `${データ.状態}・passion: ${データ.passion}点, discipline: ${データ.discipline}点${データ.備考 ? `（${データ.備考}）` : ""}`;
     },
     点数を得る: (データ) => {
         if (データ.状態 === "休日") {
@@ -52,19 +52,19 @@ const 労働Formatter = {
         return Math.round((データ.passion + データ.discipline) / 2);
     },
 };
-const ジムFormatter = {
+export const ジムFormatter = {
     文言を得る: (データ) => データ,
     点数を得る: (データ) => (データ === "サボった" ? 0 : 100),
 };
-const 勉強会Formatter = {
+export const 勉強会Formatter = {
     文言を得る: (データ) => (データ ? "参加" : "ノー"),
     点数を得る: (データ) => (データ ? 100 : 0),
 };
-const 個人開発Formatter = {
+export const 個人開発Formatter = {
     文言を得る: (データ) => (データ ? "実施" : "ノー"),
     点数を得る: (データ) => (データ ? 100 : 0),
 };
-const あすけんFormatter = {
+export const あすけんFormatter = {
     文言を得る: () => "-",
     点数を得る: (データ) => データ ?? 0,
 };

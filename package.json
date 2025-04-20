@@ -9,7 +9,8 @@
     "build": "tsc",
     "prebuild": "rm -rf dist",
     "postinstall": "simple-git-hooks",
-    "generate-types": "node --experimental-strip-types scripts/generate-types.ts"
+    "generate-types": "node --experimental-strip-types scripts/generate-types.ts",
+    "test": "node --test --experimental-strip-types src/converter.test.ts"
   },
   "simple-git-hooks": {
     "pre-commit": "npm run build"

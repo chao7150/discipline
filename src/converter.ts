@@ -2,7 +2,7 @@
  * データ変換モジュール
  */
 
-import { TaskList } from "./definitions/tasklist";
+import type { TaskList } from "./definitions/tasklist.ts";
 
 type FormattedItem2<T extends keyof TaskList> = {
   題目: T;
@@ -22,7 +22,7 @@ interface ConversionResult {
   };
 }
 
-const 起床Formatter: Formattable<"起床"> = {
+export const 起床Formatter: Formattable<"起床"> = {
   文言を得る: (データ) => `${データ.時}:${String(データ.分).padStart(2, "0")}`,
   点数を得る: (データ) => {
     const 時間 = データ.時 + データ.分 / 60;
@@ -32,7 +32,7 @@ const 起床Formatter: Formattable<"起床"> = {
   },
 };
 
-const 散歩Formatter: Formattable<"散歩"> = {
+export const 散歩Formatter: Formattable<"散歩"> = {
   文言を得る: (データ) => {
     if (!データ.実施) {
       return "ノー";
@@ -42,7 +42,7 @@ const 散歩Formatter: Formattable<"散歩"> = {
   点数を得る: (データ) => (データ.実施 ? 100 + データ.犬遭遇.数 * 10 : 0),
 };
 
-const 朝食の栄養カバレッジFormatter: Formattable<"朝食の栄養カバレッジ"> = {
+export const 朝食の栄養カバレッジFormatter: Formattable<"朝食の栄養カバレッジ"> = {
   文言を得る: (データ) => `${データ}色カバー`,
   点数を得る: (データ) => {
     const 色数 = Number(データ);
@@ -53,17 +53,17 @@ const 朝食の栄養カバレッジFormatter: Formattable<"朝食の栄養カ�
   },
 };
 
-const 体操Formatter: Formattable<"体操"> = {
+export const 体操Formatter: Formattable<"体操"> = {
   文言を得る: (データ) => (データ ? "実施" : "ノー"),
   点数を得る: (データ) => (データ ? 100 : 0),
 };
 
-const 労働Formatter: Formattable<"労働"> = {
+export const 労働Formatter: Formattable<"労働"> = {
   文言を得る: (データ) => {
     if (データ.状態 === "休日") {
       return `休日${データ.備考 ? `（${データ.備考}）` : ""}`;
     }
-    return `${データ.状態}・passion: ${データ.passion}点, discipline: ${データ.discipline}点（${データ.備考}）`;
+    return `${データ.状態}・passion: ${データ.passion}点, discipline: ${データ.discipline}点${データ.備考 ? `（${データ.備考}）` : ""}`;
   },
   点数を得る: (データ) => {
     if (データ.状態 === "休日") {
@@ -73,22 +73,22 @@ const 労働Formatter: Formattable<"労働"> = {
   },
 };
 
-const ジムFormatter: Formattable<"ジム"> = {
+export const ジムFormatter: Formattable<"ジム"> = {
   文言を得る: (データ) => データ,
   点数を得る: (データ) => (データ === "サボった" ? 0 : 100),
 };
 
-const 勉強会Formatter: Formattable<"勉強会"> = {
+export const 勉強会Formatter: Formattable<"勉強会"> = {
   文言を得る: (データ) => (データ ? "参加" : "ノー"),
   点数を得る: (データ) => (データ ? 100 : 0),
 };
 
-const 個人開発Formatter: Formattable<"個人開発"> = {
+export const 個人開発Formatter: Formattable<"個人開発"> = {
   文言を得る: (データ) => (データ ? "実施" : "ノー"),
   点数を得る: (データ) => (データ ? 100 : 0),
 };
 
-const あすけんFormatter: Formattable<"あすけん"> = {
+export const あすけんFormatter: Formattable<"あすけん"> = {
   文言を得る: () => "-",
   点数を得る: (データ) => データ ?? 0,
 };
