@@ -42,16 +42,17 @@ export const 散歩Formatter: Formattable<"散歩"> = {
   点数を得る: (データ) => (データ.実施 ? 100 + データ.犬遭遇.数 * 10 : 0),
 };
 
-export const 朝食の栄養カバレッジFormatter: Formattable<"朝食の栄養カバレッジ"> = {
-  文言を得る: (データ) => `${データ}色カバー`,
-  点数を得る: (データ) => {
-    const 色数 = Number(データ);
-    if (色数 === 0) return 0;
-    if (色数 === 1) return 60;
-    if (色数 === 2) return 80;
-    return 100;
-  },
-};
+export const 朝食の栄養カバレッジFormatter: Formattable<"朝食の栄養カバレッジ"> =
+  {
+    文言を得る: (データ) => `${データ}色カバー`,
+    点数を得る: (データ) => {
+      const 色数 = Number(データ);
+      if (色数 === 0) return 0;
+      if (色数 === 1) return 60;
+      if (色数 === 2) return 80;
+      return 100;
+    },
+  };
 
 export const 体操Formatter: Formattable<"体操"> = {
   文言を得る: (データ) => (データ ? "実施" : "ノー"),
@@ -70,6 +71,22 @@ export const 労働Formatter: Formattable<"労働"> = {
       return 100;
     }
     return Math.round((データ.passion + データ.discipline) / 2);
+  },
+};
+
+export const 睡眠時間Formatter: Formattable<"睡眠時間"> = {
+  文言を得る: (データ) => {
+    return `${データ.時間}時間${データ.分}分`;
+  },
+  点数を得る: (データ) => {
+    const totalMinutes = データ.時間 * 60 + データ.分;
+    const minMinutes = 4 * 60 + 30; // 4時間30分
+    const maxMinutes = 7 * 60; // 7時間
+    if (totalMinutes <= minMinutes) return 0;
+    if (totalMinutes >= maxMinutes) return 100;
+    return Math.round(
+      ((totalMinutes - minMinutes) / (maxMinutes - minMinutes)) * 100
+    );
   },
 };
 
@@ -96,13 +113,14 @@ export const あすけんFormatter: Formattable<"あすけん"> = {
 const formatters = {
   起床: 起床Formatter,
   散歩: 散歩Formatter,
-  "朝食の栄養カバレッジ": 朝食の栄養カバレッジFormatter,
+  朝食の栄養カバレッジ: 朝食の栄養カバレッジFormatter,
   体操: 体操Formatter,
   労働: 労働Formatter,
   ジム: ジムFormatter,
   勉強会: 勉強会Formatter,
   個人開発: 個人開発Formatter,
   あすけん: あすけんFormatter,
+  睡眠時間: 睡眠時間Formatter,
 } as const;
 
 /**
@@ -112,6 +130,7 @@ const formatters = {
  */
 export function convertData(data: TaskList): ConversionResult {
   const requiredItems: Array<keyof TaskList> = [
+    "睡眠時間",
     "起床",
     "散歩",
     "朝食の栄養カバレッジ",
@@ -131,15 +150,16 @@ export function convertData(data: TaskList): ConversionResult {
 
   // 総合点の計算
   const weights: Record<keyof TaskList, number> = {
-    起床: 13,
-    散歩: 6,
-    朝食の栄養カバレッジ: 10,
-    体操: 3,
-    労働: 26,
-    ジム: 13,
-    勉強会: 13,
-    個人開発: 6,
-    あすけん: 10,
+    起床: 8,
+    散歩: 5,
+    朝食の栄養カバレッジ: 5,
+    体操: 5,
+    労働: 24,
+    ジム: 12,
+    勉強会: 12,
+    個人開発: 7,
+    あすけん: 9,
+    睡眠時間: 13,
   };
 
   const scores = formattedData.map((item) => {

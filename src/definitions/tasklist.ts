@@ -1,4 +1,8 @@
 export interface TaskList {
+  睡眠時間: {
+    時間: number;
+    分: number;
+  };
   起床: {
     時: number;
     分: number;

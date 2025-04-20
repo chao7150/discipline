@@ -52,6 +52,21 @@ export const 労働Formatter = {
         return Math.round((データ.passion + データ.discipline) / 2);
     },
 };
+export const 睡眠時間Formatter = {
+    文言を得る: (データ) => {
+        return `${データ.時間}時間${データ.分}分`;
+    },
+    点数を得る: (データ) => {
+        const totalMinutes = データ.時間 * 60 + データ.分;
+        const minMinutes = 4 * 60 + 30; // 4時間30分
+        const maxMinutes = 7 * 60; // 7時間
+        if (totalMinutes <= minMinutes)
+            return 0;
+        if (totalMinutes >= maxMinutes)
+            return 100;
+        return Math.round(((totalMinutes - minMinutes) / (maxMinutes - minMinutes)) * 100);
+    },
+};
 export const ジムFormatter = {
     文言を得る: (データ) => データ,
     点数を得る: (データ) => (データ === "サボった" ? 0 : 100),
@@ -71,13 +86,14 @@ export const あすけんFormatter = {
 const formatters = {
     起床: 起床Formatter,
     散歩: 散歩Formatter,
-    "朝食の栄養カバレッジ": 朝食の栄養カバレッジFormatter,
+    朝食の栄養カバレッジ: 朝食の栄養カバレッジFormatter,
     体操: 体操Formatter,
     労働: 労働Formatter,
     ジム: ジムFormatter,
     勉強会: 勉強会Formatter,
     個人開発: 個人開発Formatter,
     あすけん: あすけんFormatter,
+    睡眠時間: 睡眠時間Formatter,
 };
 /**
  * 入力データを整形された形式に変換する
@@ -86,6 +102,7 @@ const formatters = {
  */
 export function convertData(data) {
     const requiredItems = [
+        "睡眠時間",
         "起床",
         "散歩",
         "朝食の栄養カバレッジ",
@@ -103,15 +120,16 @@ export function convertData(data) {
     }));
     // 総合点の計算
     const weights = {
-        起床: 13,
-        散歩: 6,
-        朝食の栄養カバレッジ: 10,
-        体操: 3,
-        労働: 26,
-        ジム: 13,
-        勉強会: 13,
-        個人開発: 6,
-        あすけん: 10,
+        起床: 8,
+        散歩: 5,
+        朝食の栄養カバレッジ: 5,
+        体操: 5,
+        労働: 24,
+        ジム: 12,
+        勉強会: 12,
+        個人開発: 7,
+        あすけん: 9,
+        睡眠時間: 13,
     };
     const scores = formattedData.map((item) => {
         const formatter = formatters[item.題目];
