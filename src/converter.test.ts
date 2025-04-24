@@ -1,5 +1,15 @@
 import assert from "assert";
-import { 労働Formatter, 起床Formatter, 散歩Formatter, 朝食の栄養カバレッジFormatter, 体操Formatter, ジムFormatter, 勉強会Formatter, 個人開発Formatter, あすけんFormatter } from "./converter.ts";
+import {
+  労働Formatter,
+  起床Formatter,
+  散歩Formatter,
+  朝食の栄養カバレッジFormatter,
+  体操Formatter,
+  ジムFormatter,
+  勉強会Formatter,
+  個人開発Formatter,
+  あすけんFormatter,
+} from "./converter.ts";
 
 function test労働Formatter() {
   // 備考あり、状態が休日でない場合
@@ -11,7 +21,7 @@ function test労働Formatter() {
   });
   assert.strictEqual(
     result,
-    "した・passion: 50点, discipline: 40点（特記事項あり）",
+    "passion: 50点, discipline: 40点（特記事項あり）",
     "備考ありのとき括弧付きで表示されること"
   );
 
@@ -24,7 +34,7 @@ function test労働Formatter() {
   });
   assert.strictEqual(
     result2,
-    "した・passion: 50点, discipline: 40点",
+    "passion: 50点, discipline: 40点",
     "備考なしのとき括弧が表示されないこと"
   );
 
@@ -61,7 +71,11 @@ function test散歩Formatter() {
 
 function test朝食の栄養カバレッジFormatter() {
   const result = 朝食の栄養カバレッジFormatter.文言を得る("3");
-  assert.strictEqual(result, "3色カバー", "朝食の栄養カバレッジFormatterの基本動作");
+  assert.strictEqual(
+    result,
+    "3色カバー",
+    "朝食の栄養カバレッジFormatterの基本動作"
+  );
 }
 
 function test体操Formatter() {
@@ -106,3 +120,48 @@ test個人開発Formatter();
 testあすけんFormatter();
 
 console.log("すべてのFormatterのテストがすべて成功しました。");
+
+import { convertData } from "./converter.ts";
+import type { TaskList } from "./definitions/tasklist.ts";
+
+function testConvertData() {
+  const testData: TaskList = {
+    睡眠時間: { 時間: 7, 分: 0 },
+    起床: { 時: 8, 分: 0 },
+    散歩: { 実施: true, ゴミ拾い: true },
+    朝食の栄養カバレッジ: "3",
+    体操: true,
+    労働: { 状態: "した", passion: 80, discipline: 70, 備考: "" },
+    ジム: "有酸素+筋トレ",
+    勉強会: true,
+    個人開発: true,
+    あすけん: 85,
+  };
+
+  const expectedMarkdown = `| 項目 | 内容 | 得点 | 換算点 |
+| ---- | ---- | ---: | ---: |
+| 睡眠時間 | 7時間0分 | 100 | 13.0/13.0 |
+| 起床 | 8:00 | 100 | 8.0/8.0 |
+| 散歩 | 実施・ゴミ拾いあり | 100 | 5.0/5.0 |
+| 朝食の栄養カバレッジ | 3色カバー | 100 | 5.0/5.0 |
+| 体操 | 実施 | 100 | 5.0/5.0 |
+| 労働 | passion: 80点, discipline: 70点 | 75 | 18.0/24.0 |
+| ジム | 有酸素+筋トレ | 100 | 12.0/12.0 |
+| 勉強会 | 参加 | 100 | 12.0/12.0 |
+| 個人開発 | 実施 | 100 | 7.0/7.0 |
+| あすけん | - | 85 | 7.7/9.0 |
+| **総合** | **1日の総合評価** | **-** | **93** |
+`;
+
+  const result = convertData(testData);
+  // 改行コードの違いを吸収するために trim() をかける
+  assert.strictEqual(
+    result.markdown.trim(),
+    expectedMarkdown.trim(),
+    "convertData の Markdown 出力が期待通りであること"
+  );
+}
+
+testConvertData();
+
+console.log("convertData のテストが成功しました。");

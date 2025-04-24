@@ -43,7 +43,7 @@ export const 労働Formatter = {
         if (データ.状態 === "休日") {
             return `休日${データ.備考 ? `（${データ.備考}）` : ""}`;
         }
-        return `${データ.状態}・passion: ${データ.passion}点, discipline: ${データ.discipline}点${データ.備考 ? `（${データ.備考}）` : ""}`;
+        return `passion: ${データ.passion}点, discipline: ${データ.discipline}点${データ.備考 ? `（${データ.備考}）` : ""}`;
     },
     点数を得る: (データ) => {
         if (データ.状態 === "休日") {
@@ -140,7 +140,7 @@ export function convertData(data) {
     const totalWeight = Object.values(weights).reduce((sum, weight) => sum + weight, 0);
     const totalScore = Math.round(scores.reduce((sum, score) => sum + score, 0) / totalWeight);
     return {
-        markdown: convertToMarkdown(formattedData, totalScore),
+        markdown: convertToMarkdown(formattedData, totalScore, weights, totalWeight),
         json: {
             items: formattedData,
             totalScore,
@@ -153,14 +153,21 @@ export function convertData(data) {
  * @param {number} totalScore - 総合点
  * @returns {string} Markdown形式の文字列
  */
-function convertToMarkdown(items, totalScore) {
-    let markdown = "| 項目 | 内容 | 得点 |\n| ---- | ---- | ---- |\n";
+function convertToMarkdown(items, totalScore, weights, totalWeight) {
+    let markdown = "| 項目 | 内容 | 得点 | 換算点 |\n| ---- | ---- | ---: | ---: |\n";
     items.forEach((item) => {
         const formatter = formatters[item.題目];
         const text = formatter.文言を得る(item.データ);
-        const score = formatter.点数を得る(item.データ);
-        markdown += `| ${item.題目} | ${text} | ${score} |\n`;
+        const score = formatter.点数を得る(item.データ); // 素点 (0-100)
+        const weight = weights[item.題目]; // 重み m
+        // n = 重みに従って換算したあとの得点 (素点 * 重み / 100)
+        const convertedScore = (score * weight) / 100;
+        // n と m を両方小数点第一位まで表示
+        const convertedScoreText = `${convertedScore.toFixed(1)}/${weight.toFixed(1)}`; // n/m 形式
+        markdown += `| ${item.題目} | ${text} | ${score} | ${convertedScoreText} |\n`;
     });
-    markdown += "| **総合** | **1日の総合評価** | **" + totalScore + "** |\n";
+    // 総合点の換算点表示はハイフンにする
+    const totalConvertedScoreText = `-`;
+    markdown += `| **総合** | **1日の総合評価** | **${totalConvertedScoreText}** | **${totalScore}** |\n`;
     return markdown;
 }

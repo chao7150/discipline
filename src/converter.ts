@@ -64,7 +64,7 @@ export const 労働Formatter: Formattable<"労働"> = {
     if (データ.状態 === "休日") {
       return `休日${データ.備考 ? `（${データ.備考}）` : ""}`;
     }
-    return `${データ.状態}・passion: ${データ.passion}点, discipline: ${データ.discipline}点${データ.備考 ? `（${データ.備考}）` : ""}`;
+    return `passion: ${データ.passion}点, discipline: ${データ.discipline}点${データ.備考 ? `（${データ.備考}）` : ""}`;
   },
   点数を得る: (データ) => {
     if (データ.状態 === "休日") {
@@ -179,7 +179,12 @@ export function convertData(data: TaskList): ConversionResult {
   );
 
   return {
-    markdown: convertToMarkdown(formattedData, totalScore),
+    markdown: convertToMarkdown(
+      formattedData,
+      totalScore,
+      weights,
+      totalWeight
+    ),
     json: {
       items: formattedData,
       totalScore,
@@ -195,18 +200,28 @@ export function convertData(data: TaskList): ConversionResult {
  */
 function convertToMarkdown(
   items: Array<FormattedItem2<keyof TaskList>>,
-  totalScore: number
+  totalScore: number,
+  weights: Record<keyof TaskList, number>,
+  totalWeight: number
 ): string {
-  let markdown = "| 項目 | 内容 | 得点 |\n| ---- | ---- | ---- |\n";
+  let markdown =
+    "| 項目 | 内容 | 得点 | 換算点 |\n| ---- | ---- | ---: | ---: |\n";
 
   items.forEach((item) => {
     const formatter = formatters[item.題目] as Formattable<typeof item.題目>;
     const text = formatter.文言を得る(item.データ);
-    const score = formatter.点数を得る(item.データ);
+    const score = formatter.点数を得る(item.データ); // 素点 (0-100)
+    const weight = weights[item.題目]; // 重み m
+    // n = 重みに従って換算したあとの得点 (素点 * 重み / 100)
+    const convertedScore = (score * weight) / 100;
+    // n と m を両方小数点第一位まで表示
+    const convertedScoreText = `${convertedScore.toFixed(1)}/${weight.toFixed(1)}`; // n/m 形式
 
-    markdown += `| ${item.題目} | ${text} | ${score} |\n`;
+    markdown += `| ${item.題目} | ${text} | ${score} | ${convertedScoreText} |\n`;
   });
 
-  markdown += "| **総合** | **1日の総合評価** | **" + totalScore + "** |\n";
+  // 総合点の換算点表示はハイフンにする
+  const totalConvertedScoreText = `-`;
+  markdown += `| **総合** | **1日の総合評価** | **${totalConvertedScoreText}** | **${totalScore}** |\n`;
   return markdown;
 }
