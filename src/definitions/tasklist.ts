@@ -10,10 +10,6 @@ export interface TaskList {
   散歩: {
     実施: boolean;
     ゴミ拾い: boolean;
-    犬遭遇: {
-      数: number;
-      備考: string;
-    };
   };
   朝食の栄養カバレッジ: '0' | '1' | '2' | '3';
   体操: boolean;

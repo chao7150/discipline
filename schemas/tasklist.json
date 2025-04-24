@@ -41,27 +41,11 @@
         },
         "ゴミ拾い": {
           "type": "boolean"
-        },
-        "犬遭遇": {
-          "type": "object",
-          "properties": {
-            "数": {
-              "type": "integer"
-            },
-            "備考": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "数",
-            "備考"
-          ]
         }
       },
       "required": [
         "実施",
-        "ゴミ拾い",
-        "犬遭遇"
+        "ゴミ拾い"
       ]
     },
     "朝食の栄養カバレッジ": {

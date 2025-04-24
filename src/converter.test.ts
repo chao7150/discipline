@@ -53,9 +53,9 @@ function test起床Formatter() {
 }
 
 function test散歩Formatter() {
-  const result = 散歩Formatter.文言を得る({ 実施: true, ゴミ拾い: true, 犬遭遇: { 数: 0, 備考: "" } });
-  assert.strictEqual(result, "実施・ゴミ拾いあり・犬遭遇0匹", "散歩Formatterの実施あり");
-  const result2 = 散歩Formatter.文言を得る({ 実施: false, ゴミ拾い: false, 犬遭遇: { 数: 0, 備考: "" } });
+  const result = 散歩Formatter.文言を得る({ 実施: true, ゴミ拾い: true });
+  assert.strictEqual(result, "実施・ゴミ拾いあり", "散歩Formatterの実施あり");
+  const result2 = 散歩Formatter.文言を得る({ 実施: false, ゴミ拾い: false });
   assert.strictEqual(result2, "ノー", "散歩Formatterの実施なし");
 }
 
