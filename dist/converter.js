@@ -5,11 +5,15 @@ export const 起床Formatter = {
     文言を得る: (データ) => `${データ.時}:${String(データ.分).padStart(2, "0")}`,
     点数を得る: (データ) => {
         const 時間 = データ.時 + データ.分 / 60;
+        if (時間 <= 5)
+            return 0; // 5時以前は0点
+        if (時間 < 7)
+            return Math.round((時間 - 5) * 50); // 5時〜7時は線形増加
         if (時間 <= 8)
-            return 100;
-        if (時間 >= 10)
-            return 0;
-        return Math.round((10 - 時間) * 50);
+            return 100; // 7時〜8時は100点
+        if (時間 < 10)
+            return Math.round((10 - 時間) * 50); // 8時〜10時は線形減少
+        return 0; // 10時以降は0点
     },
 };
 export const 散歩Formatter = {

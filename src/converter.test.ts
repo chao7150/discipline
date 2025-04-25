@@ -58,8 +58,74 @@ function test労働Formatter() {
 }
 
 function test起床Formatter() {
-  const result = 起床Formatter.文言を得る({ 時: 7, 分: 5 });
-  assert.strictEqual(result, "7:05", "起床Formatterの基本動作");
+  // 文言を得るのテスト
+  assert.strictEqual(
+    起床Formatter.文言を得る({ 時: 7, 分: 5 }),
+    "7:05",
+    "起床Formatter.文言を得る: 基本動作"
+  );
+  assert.strictEqual(
+    起床Formatter.文言を得る({ 時: 10, 分: 0 }),
+    "10:00",
+    "起床Formatter.文言を得る: 0分の場合"
+  );
+
+  // 点数を得るのテスト
+  assert.strictEqual(
+    起床Formatter.点数を得る({ 時: 4, 分: 59 }),
+    0,
+    "起床Formatter.点数を得る: 5時以前"
+  );
+  assert.strictEqual(
+    起床Formatter.点数を得る({ 時: 5, 分: 0 }),
+    0,
+    "起床Formatter.点数を得る: 5時ちょうど"
+  );
+  assert.strictEqual(
+    起床Formatter.点数を得る({ 時: 6, 分: 0 }),
+    50,
+    "起床Formatter.点数を得る: 5時〜7時の間 (6時)"
+  );
+   assert.strictEqual(
+    起床Formatter.点数を得る({ 時: 6, 分: 30 }),
+    75,
+    "起床Formatter.点数を得る: 5時〜7時の間 (6時30分)"
+  );
+  assert.strictEqual(
+    起床Formatter.点数を得る({ 時: 7, 分: 0 }),
+    100,
+    "起床Formatter.点数を得る: 7時ちょうど"
+  );
+  assert.strictEqual(
+    起床Formatter.点数を得る({ 時: 7, 分: 30 }),
+    100,
+    "起床Formatter.点数を得る: 7時〜8時の間 (7時30分)"
+  );
+  assert.strictEqual(
+    起床Formatter.点数を得る({ 時: 8, 分: 0 }),
+    100,
+    "起床Formatter.点数を得る: 8時ちょうど"
+  );
+  assert.strictEqual(
+    起床Formatter.点数を得る({ 時: 9, 分: 0 }),
+    50,
+    "起床Formatter.点数を得る: 8時〜10時の間 (9時)"
+  );
+  assert.strictEqual(
+    起床Formatter.点数を得る({ 時: 8, 分: 30 }),
+    75,
+    "起床Formatter.点数を得る: 8時〜10時の間 (8時30分)"
+  );
+  assert.strictEqual(
+    起床Formatter.点数を得る({ 時: 10, 分: 0 }),
+    0,
+    "起床Formatter.点数を得る: 10時ちょうど"
+  );
+  assert.strictEqual(
+    起床Formatter.点数を得る({ 時: 10, 分: 1 }),
+    0,
+    "起床Formatter.点数を得る: 10時以降"
+  );
 }
 
 function test散歩Formatter() {
