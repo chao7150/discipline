@@ -258,7 +258,7 @@
                     
                     // iframe埋め込みコードを生成（高さ自動調整スクリプト付き）
                     const iframeCode = `<iframe id="daily-tasks-${Date.now()}" src="${embedUrl}" width="100%" height="400" frameborder="0" style="border: none;" alt='${JSON.stringify(resultJson).replace(/'/g, '&apos;')}'></iframe>
-<script>
+<${'script'}>
 // 高さ自動調整（Daily Tasks用）
 (function() {
     window.addEventListener('message', function(e) {
@@ -272,7 +272,7 @@
         }
     });
 })();
-</script>`;
+</${'script'}>`;
                     document.getElementById('iframe-output').textContent = iframeCode;
                 });
             })
