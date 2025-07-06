@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>レスポンシブiframe埋め込み例</title>
+    <style>
+        body {
+            background-color: #222;
+            color: #e0e0e0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            padding: 20px;
+            margin: 0;
+        }
+        
+        h1 {
+            color: #f0f0f0;
+        }
+        
+        .iframe-container {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .daily-tasks-iframe {
+            width: 100%;
+            border: none;
+            transition: height 0.3s ease;
+        }
+        
+        .code-example {
+            background-color: #333;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin: 20px 0;
+        }
+        
+        pre {
+            margin: 0;
+            color: #abb2bf;
+        }
+    </style>
+</head>
+<body>
+    <h1>レスポンシブiframe埋め込み例</h1>
+    
+    <div class="iframe-container">
+        <iframe 
+            id="daily-tasks" 
+            class="daily-tasks-iframe"
+            src="embed.html?d=7,0,7,30,1,1,3,1,1,80,90,3,1,1,85,1&n=プロジェクトリリース作業"
+            height="400">
+        </iframe>
+    </div>
+    
+    <div class="code-example">
+        <h2>埋め込みコード</h2>
+        <pre><code>&lt;!-- iframe要素 --&gt;
+&lt;iframe 
+    id="daily-tasks" 
+    class="daily-tasks-iframe"
+    src="https://your-domain.com/embed.html?d=YOUR_DATA"
+    height="400"&gt;
+&lt;/iframe&gt;
+
+&lt;!-- 高さ自動調整スクリプト --&gt;
+&lt;script&gt;
+window.addEventListener('message', function(e) {
+    if (e.data.type === 'setHeight') {
+        const iframe = document.getElementById('daily-tasks');
+        if (iframe) {
+            iframe.style.height = e.data.height + 'px';
+        }
+    }
+});
+&lt;/script&gt;</code></pre>
+    </div>
+    
+    <script>
+        // iframeの高さを自動調整
+        window.addEventListener('message', function(e) {
+            if (e.data.type === 'setHeight') {
+                const iframe = document.getElementById('daily-tasks');
+                if (iframe) {
+                    iframe.style.height = e.data.height + 'px';
+                }
+            }
+        });
+    </script>
+</body>
+</html>

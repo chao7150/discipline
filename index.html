@@ -256,7 +256,23 @@
                         )
                     };
                     
-                    const iframeCode = `<iframe src="${embedUrl}" width="100%" height="400" frameborder="0" alt='${JSON.stringify(resultJson).replace(/'/g, '&apos;')}'></iframe>`;
+                    // iframe埋め込みコードを生成（高さ自動調整スクリプト付き）
+                    const iframeCode = `<iframe id="daily-tasks-${Date.now()}" src="${embedUrl}" width="100%" height="400" frameborder="0" style="border: none;" alt='${JSON.stringify(resultJson).replace(/'/g, '&apos;')}'></iframe>
+<script>
+// 高さ自動調整（Daily Tasks用）
+(function() {
+    window.addEventListener('message', function(e) {
+        if (e.data.type === 'setHeight') {
+            const iframes = document.querySelectorAll('iframe[src*="embed.html"]');
+            iframes.forEach(function(iframe) {
+                if (iframe.contentWindow === e.source) {
+                    iframe.style.height = e.data.height + 'px';
+                }
+            });
+        }
+    });
+})();
+</script>`;
                     document.getElementById('iframe-output').textContent = iframeCode;
                 });
             })
