@@ -4,7 +4,7 @@ import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 
 const __dirname = dirname(dirname(fileURLToPath(import.meta.url)));
-const port = 3000;
+const port = 3001;
 
 const mimeTypes = {
     '.html': 'text/html',
@@ -21,9 +21,13 @@ const mimeTypes = {
 const server = createServer(async (req, res) => {
     try {
         // URLからファイルパスを取得（クエリパラメータを除去）
-        const filePath = join(__dirname, req.url.split('?')[0] === '/' ? 'index.html' : req.url);
+        const urlPath = req.url.split('?')[0];
+        const requestedPath = urlPath === '/' ? 'index.html' : urlPath;
+        const filePath = join(__dirname, requestedPath);
         const extname = '.' + filePath.split('.').pop().toLowerCase();
         const contentType = mimeTypes[extname] || 'application/octet-stream';
+        
+        console.log(`Request: ${req.url} -> File: ${filePath}`);
 
         // ファイルを読み込んでレスポンスを返す
         const content = await readFile(filePath);

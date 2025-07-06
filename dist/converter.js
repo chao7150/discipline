@@ -87,6 +87,10 @@ export const あすけんFormatter = {
     文言を得る: () => "-",
     点数を得る: (データ) => データ ?? 0,
 };
+export const 体重測定Formatter = {
+    文言を得る: (データ) => (データ ? "実施" : "ノー"),
+    点数を得る: (データ) => (データ ? 100 : 0),
+};
 const formatters = {
     起床: 起床Formatter,
     散歩: 散歩Formatter,
@@ -98,11 +102,12 @@ const formatters = {
     個人開発: 個人開発Formatter,
     あすけん: あすけんFormatter,
     睡眠時間: 睡眠時間Formatter,
+    体重測定: 体重測定Formatter,
 };
 /**
  * 入力データを整形された形式に変換する
  * @param {TaskList} data - 変換するJSONデータ
- * @returns {ConversionResult} 変換結果（markdown形式とjson形式）
+ * @returns {ConversionResult} 変換結果（markdown形式）
  */
 export function convertData(data) {
     const requiredItems = [
@@ -116,6 +121,7 @@ export function convertData(data) {
         "勉強会",
         "個人開発",
         "あすけん",
+        "体重測定",
     ];
     // データの整形
     const formattedData = requiredItems.map((item) => ({
@@ -126,14 +132,15 @@ export function convertData(data) {
     const weights = {
         起床: 8,
         散歩: 5,
-        朝食の栄養カバレッジ: 5,
+        朝食の栄養カバレッジ: 4,
         体操: 5,
         労働: 24,
-        ジム: 12,
+        ジム: 11,
         勉強会: 12,
         個人開発: 7,
         あすけん: 9,
-        睡眠時間: 13,
+        睡眠時間: 12,
+        体重測定: 3,
     };
     const scores = formattedData.map((item) => {
         const formatter = formatters[item.題目];
@@ -145,10 +152,6 @@ export function convertData(data) {
     const totalScore = Math.round(scores.reduce((sum, score) => sum + score, 0) / totalWeight);
     return {
         markdown: convertToMarkdown(formattedData, totalScore, weights, totalWeight),
-        json: {
-            items: formattedData,
-            totalScore,
-        },
     };
 }
 /**

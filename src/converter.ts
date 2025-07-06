@@ -16,10 +16,6 @@ interface Formattable<T extends keyof TaskList> {
 
 interface ConversionResult {
   markdown: string;
-  json: {
-    items: Array<FormattedItem2<keyof TaskList>>;
-    totalScore: number;
-  };
 }
 
 export const 起床Formatter: Formattable<"起床"> = {
@@ -112,6 +108,11 @@ export const あすけんFormatter: Formattable<"あすけん"> = {
   点数を得る: (データ) => データ ?? 0,
 };
 
+export const 体重測定Formatter: Formattable<"体重測定"> = {
+  文言を得る: (データ) => (データ ? "実施" : "ノー"),
+  点数を得る: (データ) => (データ ? 100 : 0),
+};
+
 const formatters = {
   起床: 起床Formatter,
   散歩: 散歩Formatter,
@@ -123,12 +124,13 @@ const formatters = {
   個人開発: 個人開発Formatter,
   あすけん: あすけんFormatter,
   睡眠時間: 睡眠時間Formatter,
+  体重測定: 体重測定Formatter,
 } as const;
 
 /**
  * 入力データを整形された形式に変換する
  * @param {TaskList} data - 変換するJSONデータ
- * @returns {ConversionResult} 変換結果（markdown形式とjson形式）
+ * @returns {ConversionResult} 変換結果（markdown形式）
  */
 export function convertData(data: TaskList): ConversionResult {
   const requiredItems: Array<keyof TaskList> = [
@@ -142,6 +144,7 @@ export function convertData(data: TaskList): ConversionResult {
     "勉強会",
     "個人開発",
     "あすけん",
+    "体重測定",
   ] as const;
 
   // データの整形
@@ -154,14 +157,15 @@ export function convertData(data: TaskList): ConversionResult {
   const weights: Record<keyof TaskList, number> = {
     起床: 8,
     散歩: 5,
-    朝食の栄養カバレッジ: 5,
+    朝食の栄養カバレッジ: 4,
     体操: 5,
     労働: 24,
-    ジム: 12,
+    ジム: 11,
     勉強会: 12,
     個人開発: 7,
     あすけん: 9,
-    睡眠時間: 13,
+    睡眠時間: 12,
+    体重測定: 3,
   };
 
   const scores = formattedData.map((item) => {
@@ -187,10 +191,6 @@ export function convertData(data: TaskList): ConversionResult {
       weights,
       totalWeight
     ),
-    json: {
-      items: formattedData,
-      totalScore,
-    },
   };
 }
 

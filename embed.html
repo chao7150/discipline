@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Tasks Result</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 16px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            font-size: 14px;
+            line-height: 1.5;
+            color: #333;
+            background-color: transparent;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        
+        th, td {
+            padding: 8px 12px;
+            text-align: left;
+            border-bottom: 1px solid #e1e4e8;
+        }
+        
+        th {
+            background-color: #f6f8fa;
+            font-weight: 600;
+            color: #24292e;
+        }
+        
+        tr:last-child td {
+            border-bottom: none;
+        }
+        
+        tr:hover {
+            background-color: #f6f8fa;
+        }
+        
+        /* 得点列は右寄せ */
+        td:nth-child(3),
+        td:nth-child(4),
+        th:nth-child(3),
+        th:nth-child(4) {
+            text-align: right;
+        }
+        
+        /* 総合行を強調 */
+        tr.total {
+            font-weight: bold;
+            background-color: #f0f9ff;
+        }
+        
+        tr.total:hover {
+            background-color: #e0f2fe;
+        }
+        
+        /* エラーメッセージ */
+        .error {
+            color: #dc2626;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        /* ダークモード対応 */
+        @media (prefers-color-scheme: dark) {
+            body {
+                color: #c9d1d9;
+            }
+            
+            table {
+                background-color: #0d1117;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+            }
+            
+            th {
+                background-color: #161b22;
+                color: #c9d1d9;
+            }
+            
+            td, th {
+                border-bottom-color: #30363d;
+            }
+            
+            tr:hover {
+                background-color: #161b22;
+            }
+            
+            tr.total {
+                background-color: #1a2332;
+            }
+            
+            tr.total:hover {
+                background-color: #1f2937;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="result-container"></div>
+
+    <script type="module">
+        import { convertData } from './dist/converter.js';
+        
+        // URLパラメータからデータを取得
+        function getDataFromURL() {
+            const params = new URLSearchParams(window.location.search);
+            const compactData = params.get('d');
+            const workNote = params.get('n') || '';  // 労働の備考
+            
+            if (!compactData) {
+                return null;
+            }
+            
+            try {
+                // カンマ区切りのデータを配列に変換
+                const values = compactData.split(',');
+                
+                // ジムの値をデコード
+                const gymMap = ['サボった', '休養日', '有酸素', '有酸素+筋トレ'];
+                
+                // 元のデータ構造を復元
+                return {
+                    睡眠時間: {
+                        時間: parseInt(values[0]),
+                        分: parseInt(values[1])
+                    },
+                    起床: {
+                        時: parseInt(values[2]),
+                        分: parseInt(values[3])
+                    },
+                    散歩: {
+                        実施: values[4] === '1',
+                        ゴミ拾い: values[5] === '1'
+                    },
+                    朝食の栄養カバレッジ: values[6],
+                    体操: values[7] === '1',
+                    労働: {
+                        状態: values[8] === '0' ? '休日' : 'した',
+                        passion: parseInt(values[9]),
+                        discipline: parseInt(values[10]),
+                        備考: workNote  // URLパラメータから復元
+                    },
+                    ジム: gymMap[parseInt(values[11])],
+                    勉強会: values[12] === '1',
+                    個人開発: values[13] === '1',
+                    あすけん: parseFloat(values[14]),
+                    体重測定: values[15] === '1'
+                };
+            } catch (e) {
+                console.error('データの解析に失敗しました:', e);
+                return null;
+            }
+        }
+        
+        // Markdown形式のテーブルをHTMLに変換
+        function markdownToHtml(markdown) {
+            const lines = markdown.trim().split('\n');
+            let html = '<table>\n';
+            
+            lines.forEach((line, index) => {
+                if (index === 1) return; // 区切り行をスキップ
+                
+                const cells = line.split('|').map(cell => cell.trim()).filter(cell => cell);
+                
+                if (index === 0) {
+                    // ヘッダー行
+                    html += '<thead><tr>\n';
+                    cells.forEach(cell => {
+                        html += `<th>${cell}</th>\n`;
+                    });
+                    html += '</tr></thead>\n<tbody>\n';
+                } else {
+                    // データ行
+                    const isTotal = cells[0].includes('総合');
+                    html += `<tr${isTotal ? ' class="total"' : ''}>\n`;
+                    cells.forEach(cell => {
+                        // **で囲まれた部分を太字に変換
+                        const formattedCell = cell.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                        html += `<td>${formattedCell}</td>\n`;
+                    });
+                    html += '</tr>\n';
+                }
+            });
+            
+            html += '</tbody></table>';
+            return html;
+        }
+        
+        // メイン処理
+        function init() {
+            const container = document.getElementById('result-container');
+            const data = getDataFromURL();
+            
+            if (!data) {
+                container.innerHTML = '<div class="error">データが指定されていません</div>';
+                return;
+            }
+            
+            try {
+                const result = convertData(data);
+                const htmlTable = markdownToHtml(result.markdown);
+                container.innerHTML = htmlTable;
+            } catch (e) {
+                console.error('変換エラー:', e);
+                container.innerHTML = '<div class="error">データの変換に失敗しました</div>';
+            }
+        }
+        
+        // ページ読み込み時に実行
+        init();
+    </script>
+</body>
+
+</html>

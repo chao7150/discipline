@@ -23,4 +23,5 @@ export interface TaskList {
   勉強会: boolean;
   個人開発: boolean;
   あすけん: number;
+  体重測定: boolean;
 }

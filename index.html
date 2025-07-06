@@ -31,9 +31,26 @@
             <pre id="markdown-output" class="border p-3"></pre>
         </div>
 
+        <div class="mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h6 class="mb-0">ブログ埋め込み用</h6>
+                <button id="copy-iframe" class="btn btn-outline-secondary btn-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                        class="bi bi-clipboard" viewBox="0 0 16 16">
+                        <path
+                            d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1z" />
+                        <path
+                            d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0z" />
+                    </svg>
+                    コピー
+                </button>
+            </div>
+            <pre id="iframe-output" class="border p-3" style="font-size: 12px; white-space: pre-wrap; word-wrap: break-word;"></pre>
+        </div>
+
         <div>
             <div class="d-flex justify-content-between align-items-center mb-2">
-                <h6 class="mb-0">JSON形式</h6>
+                <h6 class="mb-0">GitHubで記録</h6>
                 <button id="edit-on-github" class="btn btn-outline-secondary btn-sm">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                         class="bi bi-github" viewBox="0 0 16 16">
@@ -43,7 +60,6 @@
                     GitHubで追記
                 </button>
             </div>
-            <pre id="json-output" class="border p-3"></pre>
         </div>
     </div>
 
@@ -113,12 +129,38 @@
                         "勉強会": true,
                         "個人開発": true,
                         "体操": true,
-                        "あすけん": 0
+                        "あすけん": 0,
+                        "体重測定": true
                     }
                 });
 
+                // iframeコードをクリップボードにコピーする関数
+                function copyIframeCode() {
+                    const iframeContent = document.getElementById('iframe-output').textContent;
+
+                    navigator.clipboard.writeText(iframeContent).then(() => {
+                        const copyBtn = document.getElementById('copy-iframe');
+                        copyBtn.innerHTML = '✓ コピーしました';
+                        copyBtn.classList.remove('btn-outline-secondary');
+                        copyBtn.classList.add('btn-success');
+
+                        setTimeout(() => {
+                            copyBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clipboard" viewBox="0 0 16 16">
+                                <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1z"/>
+                                <path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0z"/>
+                            </svg> コピー`;
+                            copyBtn.classList.remove('btn-success');
+                            copyBtn.classList.add('btn-outline-secondary');
+                        }, 2000);
+                    }).catch(err => {
+                        console.error('クリップボードへのコピーに失敗しました:', err);
+                        alert('クリップボードへのコピーに失敗しました');
+                    });
+                }
+
                 // コピーボタンのイベントリスナー
                 document.getElementById('copy').addEventListener('click', copyMarkdown);
+                document.getElementById('copy-iframe').addEventListener('click', copyIframeCode);
 
                 // GitHubで追記ボタンのイベントリスナー
                 document.getElementById('edit-on-github').addEventListener('click', () => {
@@ -133,8 +175,89 @@
                     // Markdown形式の出力
                     document.getElementById('markdown-output').textContent = result.markdown;
 
-                    // JSON形式の出力
-                    document.getElementById('json-output').textContent = JSON.stringify(result.json, null, 2);
+                    // iframe埋め込み用コードの生成
+                    // データを短縮形式に変換（労働の備考も含める）
+                    const params = new URLSearchParams();
+                    
+                    // 数値データはカンマ区切りで圧縮
+                    const compactData = [
+                        data.睡眠時間.時間,
+                        data.睡眠時間.分,
+                        data.起床.時,
+                        data.起床.分,
+                        data.散歩.実施 ? 1 : 0,
+                        data.散歩.ゴミ拾い ? 1 : 0,
+                        data.朝食の栄養カバレッジ,
+                        data.体操 ? 1 : 0,
+                        data.労働.状態 === '休日' ? 0 : 1,
+                        data.労働.passion || 0,
+                        data.労働.discipline || 0,
+                        data.ジム === 'サボった' ? 0 : data.ジム === '休養日' ? 1 : data.ジム === '有酸素' ? 2 : 3,
+                        data.勉強会 ? 1 : 0,
+                        data.個人開発 ? 1 : 0,
+                        data.あすけん || 0,
+                        data.体重測定 ? 1 : 0
+                    ].join(',');
+                    
+                    params.append('d', compactData);
+                    
+                    // 労働の備考は別パラメータで送信（空でも送信）
+                    if (data.労働.備考) {
+                        params.append('n', data.労働.備考);
+                    }
+                    
+                    // GitHub Pagesでも動作するようにパスを調整
+                    const baseUrl = window.location.href.substring(0, window.location.href.lastIndexOf('/'));
+                    const embedUrl = `${baseUrl}/embed.html?${params.toString()}`;
+                    
+                    // 結果データをJSONとして作成（altタグ用）
+                    const resultJson = {
+                        date: new Date().toISOString().split('T')[0],
+                        data: data,
+                        totalScore: Math.round(
+                            Object.entries(data).reduce((sum, [key, value]) => {
+                                const formatter = { 
+                                    '起床': (d) => {
+                                        const time = d.時 + d.分 / 60;
+                                        if (time <= 5) return 0;
+                                        if (time < 7) return Math.round((time - 5) * 50);
+                                        if (time <= 8) return 100;
+                                        if (time < 10) return Math.round((10 - time) * 50);
+                                        return 0;
+                                    },
+                                    '睡眠時間': (d) => {
+                                        const totalMinutes = d.時間 * 60 + d.分;
+                                        const minMinutes = 4 * 60 + 30;
+                                        const maxMinutes = 7 * 60;
+                                        if (totalMinutes <= minMinutes) return 0;
+                                        if (totalMinutes >= maxMinutes) return 100;
+                                        return Math.round(((totalMinutes - minMinutes) / (maxMinutes - minMinutes)) * 100);
+                                    },
+                                    '散歩': (d) => d.実施 ? 100 : 0,
+                                    '朝食の栄養カバレッジ': (d) => {
+                                        const n = Number(d);
+                                        return n === 0 ? 0 : n === 1 ? 60 : n === 2 ? 80 : 100;
+                                    },
+                                    '体操': (d) => d ? 100 : 0,
+                                    '労働': (d) => d.状態 === '休日' ? 100 : Math.round((d.passion + d.discipline) / 2),
+                                    'ジム': (d) => d === 'サボった' ? 0 : 100,
+                                    '勉強会': (d) => d ? 100 : 0,
+                                    '個人開発': (d) => d ? 100 : 0,
+                                    'あすけん': (d) => d ?? 0,
+                                    '体重測定': (d) => d ? 100 : 0
+                                }[key];
+                                const weights = {
+                                    '起床': 8, '散歩': 5, '朝食の栄養カバレッジ': 4, '体操': 5,
+                                    '労働': 24, 'ジム': 11, '勉強会': 12, '個人開発': 7,
+                                    'あすけん': 9, '睡眠時間': 12, '体重測定': 3
+                                };
+                                return sum + (formatter ? formatter(value) * weights[key] : 0);
+                            }, 0) / 100
+                        )
+                    };
+                    
+                    const iframeCode = `<iframe src="${embedUrl}" width="100%" height="400" frameborder="0" alt='${JSON.stringify(resultJson).replace(/'/g, '&apos;')}'></iframe>`;
+                    document.getElementById('iframe-output').textContent = iframeCode;
                 });
             })
             .catch(error => {
