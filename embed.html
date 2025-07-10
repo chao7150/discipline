@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Daily Tasks Result</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
         body {
             margin: 0;
@@ -14,6 +15,40 @@
             line-height: 1.5;
             color: #e0e0e0;
             background-color: #222;
+        }
+        
+        /* ビュー切替ボタン */
+        .view-toggle {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 16px;
+            gap: 8px;
+        }
+        
+        .view-toggle button {
+            background-color: #333;
+            color: #e0e0e0;
+            border: 1px solid #444;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+        
+        .view-toggle button:hover {
+            background-color: #444;
+        }
+        
+        .view-toggle button.active {
+            background-color: #2980b9;
+            border-color: #2980b9;
+            color: white;
+        }
+        
+        /* テーブルビュー */
+        .table-view {
+            display: block;
         }
         
         table {
@@ -63,6 +98,57 @@
             background-color: #34495e;
         }
         
+        /* ダッシュボードビュー */
+        .dashboard-view {
+            display: none;
+        }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+        
+        .dashboard-card {
+            background-color: #2a2a2a;
+            border-radius: 8px;
+            padding: 16px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .dashboard-card h3 {
+            margin: 0 0 12px 0;
+            color: #f0f0f0;
+            font-size: 16px;
+            font-weight: 600;
+        }
+        
+        .score-display {
+            text-align: center;
+            padding: 24px;
+            background-color: #2a2a2a;
+            border-radius: 8px;
+            margin-bottom: 16px;
+        }
+        
+        .score-value {
+            font-size: 48px;
+            font-weight: bold;
+            color: #3498db;
+            margin-bottom: 8px;
+        }
+        
+        .score-label {
+            font-size: 18px;
+            color: #888;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+        
         /* エラーメッセージ */
         .error {
             color: #ff6b6b;
@@ -70,15 +156,53 @@
             padding: 20px;
         }
         
-        /* ダークモード対応（削除） */
+        /* ビューの非表示 */
+        .hidden {
+            display: none !important;
+        }
     </style>
 </head>
 
 <body>
-    <div id="result-container"></div>
+    <div class="view-toggle">
+        <button id="table-btn" onclick="showView('table')">テーブル</button>
+        <button id="dashboard-btn" class="active" onclick="showView('dashboard')">ダッシュボード</button>
+    </div>
+    
+    <div id="table-view" class="table-view" style="display: none;">
+        <div id="result-container"></div>
+    </div>
+    
+    <div id="dashboard-view" class="dashboard-view" style="display: block;">
+        <div class="score-display">
+            <div class="score-value" id="total-score">--</div>
+            <div class="score-label">総合スコア</div>
+        </div>
+        
+        <div class="dashboard-grid">
+            <div class="dashboard-card">
+                <h3>カテゴリ別スコア</h3>
+                <div class="chart-container">
+                    <canvas id="categoryChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="dashboard-card">
+                <h3>達成率</h3>
+                <div class="chart-container">
+                    <canvas id="achievementChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script type="module">
         import { convertData } from './dist/converter.js';
+        
+        let globalData = null;
+        let globalResult = null;
+        let categoryChart = null;
+        let achievementChart = null;
         
         // URLパラメータからデータを取得
         function getDataFromURL() {
@@ -165,6 +289,200 @@
             return html;
         }
         
+        // ビュー切り替え関数
+        window.showView = function(view) {
+            const tableView = document.getElementById('table-view');
+            const dashboardView = document.getElementById('dashboard-view');
+            const tableBtn = document.getElementById('table-btn');
+            const dashboardBtn = document.getElementById('dashboard-btn');
+            
+            if (view === 'table') {
+                tableView.style.display = 'block';
+                dashboardView.style.display = 'none';
+                tableBtn.classList.add('active');
+                dashboardBtn.classList.remove('active');
+            } else {
+                tableView.style.display = 'none';
+                dashboardView.style.display = 'block';
+                tableBtn.classList.remove('active');
+                dashboardBtn.classList.add('active');
+                
+                // ダッシュボードビューが表示されたらチャートを更新
+                if (globalResult) {
+                    updateDashboard();
+                }
+            }
+            
+            // 高さを再計算
+            setTimeout(notifyHeight, 100);
+        }
+        
+        // ダッシュボード更新関数
+        function updateDashboard() {
+            // 総合スコアを表示
+            document.getElementById('total-score').textContent = globalResult.totalScore;
+            
+            // スコア計算関数
+            const scoreFormatters = {
+                '起床': (d) => {
+                    const time = d.時 + d.分 / 60;
+                    if (time <= 5) return 0;
+                    if (time < 7) return Math.round((time - 5) * 50);
+                    if (time <= 8) return 100;
+                    if (time < 10) return Math.round((10 - time) * 50);
+                    return 0;
+                },
+                '睡眠時間': (d) => {
+                    const totalMinutes = d.時間 * 60 + d.分;
+                    const minMinutes = 4 * 60 + 30;
+                    const maxMinutes = 7 * 60;
+                    if (totalMinutes <= minMinutes) return 0;
+                    if (totalMinutes >= maxMinutes) return 100;
+                    return Math.round(((totalMinutes - minMinutes) / (maxMinutes - minMinutes)) * 100);
+                },
+                '散歩': (d) => d.実施 ? 100 : 0,
+                '朝食の栄養カバレッジ': (d) => {
+                    const n = Number(d);
+                    return n === 0 ? 0 : n === 1 ? 60 : n === 2 ? 80 : 100;
+                },
+                '体操': (d) => d ? 100 : 0,
+                '労働': (d) => d.状態 === '休日' ? 100 : Math.round((d.passion + d.discipline) / 2),
+                'ジム': (d) => d === 'サボった' ? 0 : 100,
+                '勉強会': (d) => d ? 100 : 0,
+                '個人開発': (d) => d ? 100 : 0,
+                'あすけん': (d) => d ?? 0,
+                '体重測定': (d) => d ? 100 : 0
+            };
+            
+            const weights = {
+                '起床': 8, '散歩': 5, '朝食の栄養カバレッジ': 4, '体操': 5,
+                '労働': 24, 'ジム': 11, '勉強会': 12, '個人開発': 7,
+                'あすけん': 9, '睡眠時間': 12, '体重測定': 3
+            };
+            
+            // カテゴリ別スコアデータを準備
+            const categories = [];
+            const scores = [];
+            const weightedScores = [];
+            
+            Object.entries(globalData).forEach(([key, value]) => {
+                if (scoreFormatters[key]) {
+                    const score = scoreFormatters[key](value);
+                    const weight = weights[key] || 0;
+                    categories.push(key);
+                    scores.push(score);
+                    weightedScores.push(Math.round(score * weight / 100));
+                }
+            });
+            
+            // カテゴリ別スコアチャート
+            const ctxCategory = document.getElementById('categoryChart').getContext('2d');
+            if (categoryChart) {
+                categoryChart.destroy();
+            }
+            categoryChart = new Chart(ctxCategory, {
+                type: 'bar',
+                data: {
+                    labels: categories,
+                    datasets: [{
+                        label: '達成率 (%)',
+                        data: scores,
+                        backgroundColor: 'rgba(52, 152, 219, 0.8)',
+                        borderColor: 'rgba(52, 152, 219, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                color: '#e0e0e0'
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                color: '#e0e0e0',
+                                maxRotation: 45,
+                                minRotation: 45
+                            },
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.parsed.y}%`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // 達成率ドーナツチャート
+            const achieved = scores.filter(s => s >= 60).length;
+            const total = scores.length;
+            const achievementRate = Math.round((achieved / total) * 100);
+            
+            const ctxAchievement = document.getElementById('achievementChart').getContext('2d');
+            if (achievementChart) {
+                achievementChart.destroy();
+            }
+            achievementChart = new Chart(ctxAchievement, {
+                type: 'doughnut',
+                data: {
+                    labels: ['達成', '未達成'],
+                    datasets: [{
+                        data: [achieved, total - achieved],
+                        backgroundColor: [
+                            'rgba(46, 204, 113, 0.8)',
+                            'rgba(231, 76, 60, 0.8)'
+                        ],
+                        borderColor: [
+                            'rgba(46, 204, 113, 1)',
+                            'rgba(231, 76, 60, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: '#e0e0e0'
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.parsed;
+                                    const percentage = Math.round((value / total) * 100);
+                                    return `${label}: ${value}項目 (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
         // メイン処理
         function init() {
             const container = document.getElementById('result-container');
@@ -172,16 +490,22 @@
             
             if (!data) {
                 container.innerHTML = '<div class="error">データが指定されていません</div>';
+                document.getElementById('total-score').textContent = '--';
                 return;
             }
             
             try {
-                const result = convertData(data);
-                const htmlTable = markdownToHtml(result.markdown);
+                globalData = data;
+                globalResult = convertData(data);
+                const htmlTable = markdownToHtml(globalResult.markdown);
                 container.innerHTML = htmlTable;
+                
+                // ダッシュボードを更新
+                updateDashboard();
             } catch (e) {
                 console.error('変換エラー:', e);
                 container.innerHTML = '<div class="error">データの変換に失敗しました</div>';
+                document.getElementById('total-score').textContent = '--';
             }
         }
         

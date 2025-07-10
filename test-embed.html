@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Embed Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .iframe-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .iframe-container h2 {
+            margin-top: 0;
+            color: #555;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Daily Tasks Embed テスト</h1>
+        
+        <div class="iframe-container">
+            <h2>テストデータ1: 高スコアパターン</h2>
+            <iframe id="test1" src="embed.html?d=7,30,6,30,1,1,3,1,1,80,85,3,1,1,95,1&n=集中して作業できた" 
+                    width="100%" height="600" frameborder="0" style="border: 1px solid #ddd;"></iframe>
+        </div>
+        
+        <div class="iframe-container">
+            <h2>テストデータ2: 中スコアパターン</h2>
+            <iframe id="test2" src="embed.html?d=6,0,8,30,1,0,2,1,1,60,60,2,1,0,75,1&n=普通の一日" 
+                    width="100%" height="600" frameborder="0" style="border: 1px solid #ddd;"></iframe>
+        </div>
+        
+        <div class="iframe-container">
+            <h2>テストデータ3: 低スコアパターン</h2>
+            <iframe id="test3" src="embed.html?d=4,0,10,0,0,0,1,0,1,30,40,0,0,0,50,0&n=体調不良" 
+                    width="100%" height="600" frameborder="0" style="border: 1px solid #ddd;"></iframe>
+        </div>
+        
+        <div class="iframe-container">
+            <h2>テストデータ4: 休日パターン</h2>
+            <iframe id="test4" src="embed.html?d=8,0,7,0,1,1,3,1,0,0,0,3,1,1,90,1&n=" 
+                    width="100%" height="600" frameborder="0" style="border: 1px solid #ddd;"></iframe>
+        </div>
+    </div>
+
+    <script>
+        // 高さ自動調整
+        window.addEventListener('message', function(e) {
+            if (e.data.type === 'setHeight') {
+                const iframes = document.querySelectorAll('iframe');
+                iframes.forEach(function(iframe) {
+                    if (iframe.contentWindow === e.source) {
+                        iframe.style.height = e.data.height + 'px';
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
