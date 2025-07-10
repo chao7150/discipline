@@ -12,7 +12,7 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             font-size: 14px;
             line-height: 1.5;
-            color: #e0e0e0;
+            color: #ffffff;
             background-color: #222;
         }
         
@@ -26,7 +26,7 @@
         
         .view-toggle button {
             background-color: #333;
-            color: #e0e0e0;
+            color: #ffffff;
             border: 1px solid #444;
             padding: 6px 12px;
             border-radius: 4px;
@@ -40,8 +40,8 @@
         }
         
         .view-toggle button.active {
-            background-color: #2980b9;
-            border-color: #2980b9;
+            background-color: #1f618d;
+            border-color: #1f618d;
             color: white;
         }
         
@@ -151,7 +151,7 @@
         
         .score-label {
             font-size: 18px;
-            color: #999;
+            color: #a0a0a0;
         }
         
         /* 時計表示 */
@@ -204,7 +204,7 @@
         
         .icon-item .label {
             font-size: 11px;
-            color: #e0e0e0;
+            color: #ffffff;
         }
         
         
@@ -294,7 +294,7 @@
         
         .work-metric-label {
             font-size: 11px;
-            color: #999;
+            color: #a0a0a0;
             text-transform: uppercase;
         }
         
@@ -312,10 +312,10 @@
             font-size: 14px;
         }
         
-        .level-0 { background-color: #c0392b; }
-        .level-1 { background-color: #5d6d7e; }
-        .level-2 { background-color: #935a0c; }
-        .level-3 { background-color: #1e8449; }
+        .level-0 { background-color: #c0392b; color: #ffffff; }
+        .level-1 { background-color: #5d6d7e; color: #ffffff; }
+        .level-2 { background-color: #935a0c; color: #ffffff; }
+        .level-3 { background-color: #1e8449; color: #ffffff; }
         
         
         /* エラーメッセージ */
@@ -360,17 +360,17 @@
                         <path id="sleep-arc" fill="#2980b9" opacity="0.3" />
                         
                         <!-- 時刻の数字 -->
-                        <text x="100" y="20" text-anchor="middle" fill="#999" font-size="14">0</text>
-                        <text x="180" y="105" text-anchor="middle" fill="#999" font-size="14">6</text>
-                        <text x="100" y="190" text-anchor="middle" fill="#999" font-size="14">12</text>
-                        <text x="20" y="105" text-anchor="middle" fill="#999" font-size="14">18</text>
+                        <text x="100" y="20" text-anchor="middle" fill="#a0a0a0" font-size="14">0</text>
+                        <text x="180" y="105" text-anchor="middle" fill="#a0a0a0" font-size="14">6</text>
+                        <text x="100" y="190" text-anchor="middle" fill="#a0a0a0" font-size="14">12</text>
+                        <text x="20" y="105" text-anchor="middle" fill="#a0a0a0" font-size="14">18</text>
                         
                         <!-- 中心点 -->
-                        <circle cx="100" cy="100" r="3" fill="#e0e0e0"/>
+                        <circle cx="100" cy="100" r="3" fill="#ffffff"/>
                         
                         <!-- 睡眠時間と起床時刻のテキスト -->
                         <text id="sleep-duration" x="100" y="130" text-anchor="middle" fill="#3498db" font-size="16" font-weight="bold">--</text>
-                        <text id="wake-time-text" x="100" y="75" text-anchor="middle" fill="#e0e0e0" font-size="14">--</text>
+                        <text id="wake-time-text" x="100" y="75" text-anchor="middle" fill="#ffffff" font-size="14">--</text>
                     </svg>
                 </div>
             </div>
@@ -667,7 +667,7 @@
             if (globalData.労働.状態 === '休日') {
                 workDisplay.innerHTML = `
                     <div class="work-status" style="color: #2ecc71;">休日</div>
-                    <div style="font-size: 14px; color: #999;">お疲れ様でした</div>
+                    <div style="font-size: 14px; color: #a0a0a0;">お疲れ様でした</div>
                 `;
             } else {
                 workDisplay.innerHTML = `
