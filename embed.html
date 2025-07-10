@@ -5,7 +5,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Daily Tasks Result</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
         body {
             margin: 0;
@@ -113,7 +112,7 @@
         
         .dashboard-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 16px;
             margin-bottom: 16px;
         }
@@ -126,10 +125,13 @@
         }
         
         .dashboard-card h3 {
-            margin: 0 0 12px 0;
+            margin: 0 0 16px 0;
             color: #f0f0f0;
-            font-size: 16px;
+            font-size: 14px;
             font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            opacity: 0.8;
         }
         
         .score-display {
@@ -152,10 +154,172 @@
             color: #888;
         }
         
-        .chart-container {
-            position: relative;
-            height: 300px;
+        /* 時間表示 */
+        .time-display {
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            margin: 16px 0;
         }
+        
+        .time-item {
+            text-align: center;
+        }
+        
+        .time-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #3498db;
+            margin-bottom: 4px;
+        }
+        
+        .time-label {
+            font-size: 12px;
+            color: #888;
+        }
+        
+        /* アイコン表示 */
+        .icon-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            gap: 12px;
+            margin: 16px 0;
+        }
+        
+        .icon-item {
+            text-align: center;
+            padding: 12px;
+            border-radius: 8px;
+            background-color: #333;
+            transition: all 0.2s;
+        }
+        
+        .icon-item.active {
+            background-color: #2ecc71;
+        }
+        
+        .icon-item.inactive {
+            opacity: 0.4;
+        }
+        
+        .icon-item .icon {
+            font-size: 24px;
+            margin-bottom: 4px;
+        }
+        
+        .icon-item .label {
+            font-size: 11px;
+            color: #e0e0e0;
+        }
+        
+        /* プログレスバー */
+        .progress-item {
+            margin: 16px 0;
+        }
+        
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background-color: #333;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background-color: #3498db;
+            transition: width 0.3s;
+        }
+        
+        /* ゲージ表示 */
+        .gauge-container {
+            text-align: center;
+            margin: 16px 0;
+        }
+        
+        .gauge-value {
+            font-size: 36px;
+            font-weight: bold;
+            color: #3498db;
+            margin-bottom: 8px;
+        }
+        
+        .gauge-bar {
+            width: 100%;
+            height: 20px;
+            background-color: #333;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .gauge-fill {
+            height: 100%;
+            background: linear-gradient(to right, #e74c3c, #f39c12, #2ecc71);
+            transition: width 0.3s;
+        }
+        
+        /* 労働表示 */
+        .work-display {
+            text-align: center;
+            padding: 16px;
+            background-color: #333;
+            border-radius: 8px;
+            margin: 16px 0;
+        }
+        
+        .work-status {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 12px;
+        }
+        
+        .work-metrics {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 12px;
+        }
+        
+        .work-metric {
+            text-align: center;
+        }
+        
+        .work-metric-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #3498db;
+        }
+        
+        .work-metric-label {
+            font-size: 11px;
+            color: #888;
+            text-transform: uppercase;
+        }
+        
+        /* レベル表示 */
+        .level-display {
+            text-align: center;
+            margin: 16px 0;
+        }
+        
+        .level-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
+        .level-0 { background-color: #e74c3c; }
+        .level-1 { background-color: #95a5a6; }
+        .level-2 { background-color: #f39c12; }
+        .level-3 { background-color: #2ecc71; }
         
         /* エラーメッセージ */
         .error {
@@ -189,16 +353,64 @@
         
         <div class="dashboard-grid">
             <div class="dashboard-card">
-                <h3>カテゴリ別スコア</h3>
-                <div class="chart-container">
-                    <canvas id="categoryChart"></canvas>
+                <h3>⏰ 時間管理</h3>
+                <div class="time-display">
+                    <div class="time-item">
+                        <div class="time-value" id="sleep-time">--</div>
+                        <div class="time-label">睡眠時間</div>
+                    </div>
+                    <div class="time-item">
+                        <div class="time-value" id="wake-time">--</div>
+                        <div class="time-label">起床時刻</div>
+                    </div>
                 </div>
             </div>
             
             <div class="dashboard-card">
-                <h3>達成率</h3>
-                <div class="chart-container">
-                    <canvas id="achievementChart"></canvas>
+                <h3>🏃 日常活動</h3>
+                <div class="icon-grid" id="daily-activities">
+                    <!-- アイコンは動的に生成 -->
+                </div>
+            </div>
+            
+            <div class="dashboard-card">
+                <h3>🍽️ 食事・健康</h3>
+                <div class="progress-item">
+                    <div class="progress-label">
+                        <span>朝食の栄養カバレッジ</span>
+                        <span id="breakfast-level">--</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="breakfast-progress"></div>
+                    </div>
+                </div>
+                <div class="gauge-container">
+                    <div class="gauge-value" id="asuken-score">--</div>
+                    <div class="gauge-label">あすけん</div>
+                    <div class="gauge-bar">
+                        <div class="gauge-fill" id="asuken-gauge"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="dashboard-card">
+                <h3>💼 仕事</h3>
+                <div class="work-display" id="work-display">
+                    <!-- 動的に生成 -->
+                </div>
+            </div>
+            
+            <div class="dashboard-card">
+                <h3>💪 運動</h3>
+                <div class="level-display" id="gym-display">
+                    <!-- 動的に生成 -->
+                </div>
+            </div>
+            
+            <div class="dashboard-card">
+                <h3>📚 学習・成長</h3>
+                <div class="icon-grid" id="learning-activities">
+                    <!-- アイコンは動的に生成 -->
                 </div>
             </div>
         </div>
@@ -209,8 +421,6 @@
         
         let globalData = null;
         let globalResult = null;
-        let categoryChart = null;
-        let achievementChart = null;
         
         // URLパラメータからデータを取得
         function getDataFromURL() {
@@ -330,164 +540,102 @@
             // 総合スコアを表示
             document.getElementById('total-score').textContent = globalResult.totalScore;
             
-            // スコア計算関数
-            const scoreFormatters = {
-                '起床': (d) => {
-                    const time = d.時 + d.分 / 60;
-                    if (time <= 5) return 0;
-                    if (time < 7) return Math.round((time - 5) * 50);
-                    if (time <= 8) return 100;
-                    if (time < 10) return Math.round((10 - time) * 50);
-                    return 0;
-                },
-                '睡眠時間': (d) => {
-                    const totalMinutes = d.時間 * 60 + d.分;
-                    const minMinutes = 4 * 60 + 30;
-                    const maxMinutes = 7 * 60;
-                    if (totalMinutes <= minMinutes) return 0;
-                    if (totalMinutes >= maxMinutes) return 100;
-                    return Math.round(((totalMinutes - minMinutes) / (maxMinutes - minMinutes)) * 100);
-                },
-                '散歩': (d) => d.実施 ? 100 : 0,
-                '朝食の栄養カバレッジ': (d) => {
-                    const n = Number(d);
-                    return n === 0 ? 0 : n === 1 ? 60 : n === 2 ? 80 : 100;
-                },
-                '体操': (d) => d ? 100 : 0,
-                '労働': (d) => d.状態 === '休日' ? 100 : Math.round((d.passion + d.discipline) / 2),
-                'ジム': (d) => d === 'サボった' ? 0 : 100,
-                '勉強会': (d) => d ? 100 : 0,
-                '個人開発': (d) => d ? 100 : 0,
-                'あすけん': (d) => d ?? 0,
-                '体重測定': (d) => d ? 100 : 0
-            };
+            // 1. 時間管理
+            const sleepHours = globalData.睡眠時間.時間;
+            const sleepMinutes = globalData.睡眠時間.分;
+            document.getElementById('sleep-time').textContent = `${sleepHours}時間${sleepMinutes}分`;
             
-            const weights = {
-                '起床': 8, '散歩': 5, '朝食の栄養カバレッジ': 4, '体操': 5,
-                '労働': 24, 'ジム': 11, '勉強会': 12, '個人開発': 7,
-                'あすけん': 9, '睡眠時間': 12, '体重測定': 3
-            };
+            const wakeHour = globalData.起床.時;
+            const wakeMinute = globalData.起床.分;
+            document.getElementById('wake-time').textContent = 
+                `${wakeHour}:${String(wakeMinute).padStart(2, '0')}`;
             
-            // カテゴリ別スコアデータを準備
-            const categories = [];
-            const scores = [];
-            const weightedScores = [];
+            // 2. 日常活動
+            const dailyActivities = document.getElementById('daily-activities');
+            dailyActivities.innerHTML = '';
             
-            Object.entries(globalData).forEach(([key, value]) => {
-                if (scoreFormatters[key]) {
-                    const score = scoreFormatters[key](value);
-                    const weight = weights[key] || 0;
-                    categories.push(key);
-                    scores.push(score);
-                    weightedScores.push(Math.round(score * weight / 100));
-                }
+            const dailyItems = [
+                { key: '散歩', icon: '🚶', label: '散歩', active: globalData.散歩.実施 },
+                { key: 'ゴミ拾い', icon: '🗑️', label: 'ゴミ拾い', active: globalData.散歩.ゴミ拾い },
+                { key: '体操', icon: '🤸', label: '体操', active: globalData.体操 },
+                { key: '体重測定', icon: '⚖️', label: '体重', active: globalData.体重測定 }
+            ];
+            
+            dailyItems.forEach(item => {
+                const div = document.createElement('div');
+                div.className = `icon-item ${item.active ? 'active' : 'inactive'}`;
+                div.innerHTML = `
+                    <div class="icon">${item.icon}</div>
+                    <div class="label">${item.label}</div>
+                `;
+                dailyActivities.appendChild(div);
             });
             
-            // カテゴリ別スコアチャート
-            const ctxCategory = document.getElementById('categoryChart').getContext('2d');
-            if (categoryChart) {
-                categoryChart.destroy();
-            }
-            categoryChart = new Chart(ctxCategory, {
-                type: 'bar',
-                data: {
-                    labels: categories,
-                    datasets: [{
-                        label: '達成率 (%)',
-                        data: scores,
-                        backgroundColor: 'rgba(52, 152, 219, 0.8)',
-                        borderColor: 'rgba(52, 152, 219, 1)',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            max: 100,
-                            ticks: {
-                                color: '#e0e0e0'
-                            },
-                            grid: {
-                                color: 'rgba(255, 255, 255, 0.1)'
-                            }
-                        },
-                        x: {
-                            ticks: {
-                                color: '#e0e0e0',
-                                maxRotation: 45,
-                                minRotation: 45
-                            },
-                            grid: {
-                                display: false
-                            }
-                        }
-                    },
-                    plugins: {
-                        legend: {
-                            display: false
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return `${context.parsed.y}%`;
-                                }
-                            }
-                        }
-                    }
-                }
-            });
+            // 3. 食事・健康
+            const breakfastLevels = ['なし', '低', '中', '高'];
+            const breakfastValue = Number(globalData.朝食の栄養カバレッジ);
+            document.getElementById('breakfast-level').textContent = breakfastLevels[breakfastValue];
+            document.getElementById('breakfast-progress').style.width = `${(breakfastValue / 3) * 100}%`;
             
-            // 達成率ドーナツチャート
-            const achieved = scores.filter(s => s >= 60).length;
-            const total = scores.length;
-            const achievementRate = Math.round((achieved / total) * 100);
+            const asukenScore = globalData.あすけん || 0;
+            document.getElementById('asuken-score').textContent = asukenScore;
+            document.getElementById('asuken-gauge').style.width = `${asukenScore}%`;
             
-            const ctxAchievement = document.getElementById('achievementChart').getContext('2d');
-            if (achievementChart) {
-                achievementChart.destroy();
+            // 4. 仕事
+            const workDisplay = document.getElementById('work-display');
+            if (globalData.労働.状態 === '休日') {
+                workDisplay.innerHTML = `
+                    <div class="work-status" style="color: #2ecc71;">休日</div>
+                    <div style="font-size: 14px; color: #888;">お疲れ様でした</div>
+                `;
+            } else {
+                workDisplay.innerHTML = `
+                    <div class="work-status">仕事をした</div>
+                    <div class="work-metrics">
+                        <div class="work-metric">
+                            <div class="work-metric-value">${globalData.労働.passion}</div>
+                            <div class="work-metric-label">Passion</div>
+                        </div>
+                        <div class="work-metric">
+                            <div class="work-metric-value">${globalData.労働.discipline}</div>
+                            <div class="work-metric-label">Discipline</div>
+                        </div>
+                    </div>
+                    ${globalData.労働.備考 ? `<div style="margin-top: 12px; font-size: 12px; color: #bbb;">${globalData.労働.備考}</div>` : ''}
+                `;
             }
-            achievementChart = new Chart(ctxAchievement, {
-                type: 'doughnut',
-                data: {
-                    labels: ['達成', '未達成'],
-                    datasets: [{
-                        data: [achieved, total - achieved],
-                        backgroundColor: [
-                            'rgba(46, 204, 113, 0.8)',
-                            'rgba(231, 76, 60, 0.8)'
-                        ],
-                        borderColor: [
-                            'rgba(46, 204, 113, 1)',
-                            'rgba(231, 76, 60, 1)'
-                        ],
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: {
-                                color: '#e0e0e0'
-                            }
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    const label = context.label || '';
-                                    const value = context.parsed;
-                                    const percentage = Math.round((value / total) * 100);
-                                    return `${label}: ${value}項目 (${percentage}%)`;
-                                }
-                            }
-                        }
-                    }
-                }
+            
+            // 5. 運動
+            const gymDisplay = document.getElementById('gym-display');
+            const gymLevels = {
+                'サボった': { level: 0, label: 'サボった', icon: '😔' },
+                '休養日': { level: 1, label: '休養日', icon: '😴' },
+                '有酸素': { level: 2, label: '有酸素', icon: '🏃' },
+                '有酸素+筋トレ': { level: 3, label: '有酸素+筋トレ', icon: '💪' }
+            };
+            const gymInfo = gymLevels[globalData.ジム];
+            gymDisplay.innerHTML = `
+                <div style="font-size: 36px; margin-bottom: 8px;">${gymInfo.icon}</div>
+                <div class="level-badge level-${gymInfo.level}">${gymInfo.label}</div>
+            `;
+            
+            // 6. 学習・成長
+            const learningActivities = document.getElementById('learning-activities');
+            learningActivities.innerHTML = '';
+            
+            const learningItems = [
+                { key: '勉強会', icon: '📖', label: '勉強会', active: globalData.勉強会 },
+                { key: '個人開発', icon: '💻', label: '個人開発', active: globalData.個人開発 }
+            ];
+            
+            learningItems.forEach(item => {
+                const div = document.createElement('div');
+                div.className = `icon-item ${item.active ? 'active' : 'inactive'}`;
+                div.innerHTML = `
+                    <div class="icon">${item.icon}</div>
+                    <div class="label">${item.label}</div>
+                `;
+                learningActivities.appendChild(div);
             });
         }
         
