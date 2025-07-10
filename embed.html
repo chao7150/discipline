@@ -151,7 +151,7 @@
         
         .score-label {
             font-size: 18px;
-            color: #888;
+            color: #999;
         }
         
         /* 時計表示 */
@@ -190,7 +190,7 @@
         }
         
         .icon-item.active {
-            background-color: #27ae60;
+            background-color: #1e8449;
         }
         
         .icon-item.inactive {
@@ -294,7 +294,7 @@
         
         .work-metric-label {
             font-size: 11px;
-            color: #888;
+            color: #999;
             text-transform: uppercase;
         }
         
@@ -312,10 +312,10 @@
             font-size: 14px;
         }
         
-        .level-0 { background-color: #e74c3c; }
-        .level-1 { background-color: #95a5a6; }
-        .level-2 { background-color: #f39c12; }
-        .level-3 { background-color: #27ae60; }
+        .level-0 { background-color: #c0392b; }
+        .level-1 { background-color: #5d6d7e; }
+        .level-2 { background-color: #935a0c; }
+        .level-3 { background-color: #1e8449; }
         
         
         /* エラーメッセージ */
@@ -360,10 +360,10 @@
                         <path id="sleep-arc" fill="#2980b9" opacity="0.3" />
                         
                         <!-- 時刻の数字 -->
-                        <text x="100" y="20" text-anchor="middle" fill="#888" font-size="14">0</text>
-                        <text x="180" y="105" text-anchor="middle" fill="#888" font-size="14">6</text>
-                        <text x="100" y="190" text-anchor="middle" fill="#888" font-size="14">12</text>
-                        <text x="20" y="105" text-anchor="middle" fill="#888" font-size="14">18</text>
+                        <text x="100" y="20" text-anchor="middle" fill="#999" font-size="14">0</text>
+                        <text x="180" y="105" text-anchor="middle" fill="#999" font-size="14">6</text>
+                        <text x="100" y="190" text-anchor="middle" fill="#999" font-size="14">12</text>
+                        <text x="20" y="105" text-anchor="middle" fill="#999" font-size="14">18</text>
                         
                         <!-- 中心点 -->
                         <circle cx="100" cy="100" r="3" fill="#e0e0e0"/>
@@ -667,7 +667,7 @@
             if (globalData.労働.状態 === '休日') {
                 workDisplay.innerHTML = `
                     <div class="work-status" style="color: #2ecc71;">休日</div>
-                    <div style="font-size: 14px; color: #888;">お疲れ様でした</div>
+                    <div style="font-size: 14px; color: #999;">お疲れ様でした</div>
                 `;
             } else {
                 workDisplay.innerHTML = `
