@@ -207,11 +207,6 @@
             color: #e0e0e0;
         }
         
-        .icon-item .score {
-            font-size: 10px;
-            color: #3498db;
-            margin-top: 2px;
-        }
         
         /* プログレスバー */
         .progress-item {
@@ -322,6 +317,59 @@
         .level-2 { background-color: #f39c12; }
         .level-3 { background-color: #2ecc71; }
         
+        /* スコアパネル */
+        .score-panel {
+            background-color: #2a2a2a;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+        
+        .score-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        
+        .score-item {
+            text-align: center;
+            padding: 12px 8px;
+            background-color: #333;
+            border-radius: 6px;
+        }
+        
+        .score-item-label {
+            font-size: 11px;
+            color: #888;
+            margin-bottom: 4px;
+        }
+        
+        .score-item-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #3498db;
+        }
+        
+        .score-total {
+            text-align: center;
+            padding: 16px;
+            background-color: #2c3e50;
+            border-radius: 6px;
+        }
+        
+        .score-total-label {
+            font-size: 14px;
+            color: #888;
+            margin-bottom: 4px;
+        }
+        
+        .score-total-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #3498db;
+        }
+        
         /* エラーメッセージ */
         .error {
             color: #ff6b6b;
@@ -347,9 +395,14 @@
     </div>
     
     <div id="dashboard-view" class="dashboard-view active">
-        <div class="score-display">
-            <div class="score-value" id="total-score">--</div>
-            <div class="score-label">総合スコア</div>
+        <div class="score-panel">
+            <div class="score-grid" id="score-details">
+                <!-- 各項目の点数は動的に生成 -->
+            </div>
+            <div class="score-total">
+                <div class="score-total-label">総合スコア</div>
+                <div class="score-total-value" id="total-score">--</div>
+            </div>
         </div>
         
         <div class="dashboard-grid">
@@ -376,7 +429,6 @@
                         <text id="sleep-duration" x="100" y="130" text-anchor="middle" fill="#3498db" font-size="16" font-weight="bold">--</text>
                         <text id="wake-time-text" x="100" y="75" text-anchor="middle" fill="#e0e0e0" font-size="14">--</text>
                     </svg>
-                    <div class="clock-score" id="time-score">--点</div>
                 </div>
             </div>
             
@@ -586,6 +638,34 @@
             // 総合スコアを表示
             document.getElementById('total-score').textContent = globalResult.totalScore;
             
+            // スコアパネルの更新
+            const scoreDetails = document.getElementById('score-details');
+            scoreDetails.innerHTML = '';
+            
+            const scoreItems = [
+                { label: '睡眠時間', score: scoreFormatters['睡眠時間'](globalData.睡眠時間) },
+                { label: '起床', score: scoreFormatters['起床'](globalData.起床) },
+                { label: '散歩', score: scoreFormatters['散歩'](globalData.散歩) },
+                { label: '体操', score: scoreFormatters['体操'](globalData.体操) },
+                { label: '体重測定', score: scoreFormatters['体重測定'](globalData.体重測定) },
+                { label: '朝食', score: scoreFormatters['朝食の栄養カバレッジ'](globalData.朝食の栄養カバレッジ) },
+                { label: 'あすけん', score: scoreFormatters['あすけん'](globalData.あすけん) },
+                { label: '労働', score: scoreFormatters['労働'](globalData.労働) },
+                { label: 'ジム', score: scoreFormatters['ジム'](globalData.ジム) },
+                { label: '勉強会', score: scoreFormatters['勉強会'](globalData.勉強会) },
+                { label: '個人開発', score: scoreFormatters['個人開発'](globalData.個人開発) }
+            ];
+            
+            scoreItems.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'score-item';
+                div.innerHTML = `
+                    <div class="score-item-label">${item.label}</div>
+                    <div class="score-item-value">${item.score}</div>
+                `;
+                scoreDetails.appendChild(div);
+            });
+            
             // 1. 睡眠・起床時計
             const sleepHours = globalData.睡眠時間.時間;
             const sleepMinutes = globalData.睡眠時間.分;
@@ -635,21 +715,16 @@
             document.getElementById('sleep-duration').textContent = `${sleepHours}時間${sleepMinutes}分`;
             document.getElementById('wake-time-text').textContent = `起床 ${wakeHour}:${String(wakeMinute).padStart(2, '0')}`;
             
-            // 時間関連のスコア計算
-            const sleepScore = scoreFormatters['睡眠時間'](globalData.睡眠時間);
-            const wakeScore = scoreFormatters['起床'](globalData.起床);
-            const timeScore = Math.round((sleepScore + wakeScore) / 2);
-            document.getElementById('time-score').textContent = `${timeScore}点`;
             
             // 2. 日常活動
             const dailyActivities = document.getElementById('daily-activities');
             dailyActivities.innerHTML = '';
             
             const dailyItems = [
-                { key: '散歩', icon: '🚶', label: '散歩', active: globalData.散歩.実施, score: scoreFormatters['散歩'](globalData.散歩) },
-                { key: 'ゴミ拾い', icon: '🗑️', label: 'ゴミ拾い', active: globalData.散歩.ゴミ拾い, score: null },
-                { key: '体操', icon: '🤸', label: '体操', active: globalData.体操, score: scoreFormatters['体操'](globalData.体操) },
-                { key: '体重測定', icon: '⚖️', label: '体重', active: globalData.体重測定, score: scoreFormatters['体重測定'](globalData.体重測定) }
+                { key: '散歩', icon: '🚶', label: '散歩', active: globalData.散歩.実施 },
+                { key: 'ゴミ拾い', icon: '🗑️', label: 'ゴミ拾い', active: globalData.散歩.ゴミ拾い },
+                { key: '体操', icon: '🤸', label: '体操', active: globalData.体操 },
+                { key: '体重測定', icon: '⚖️', label: '体重', active: globalData.体重測定 }
             ];
             
             dailyItems.forEach(item => {
@@ -658,7 +733,6 @@
                 div.innerHTML = `
                     <div class="icon">${item.icon}</div>
                     <div class="label">${item.label}</div>
-                    ${item.score !== null ? `<div class="score">${item.score}点</div>` : ''}
                 `;
                 dailyActivities.appendChild(div);
             });
@@ -666,22 +740,19 @@
             // 3. 食事・健康
             const breakfastLevels = ['なし', '低', '中', '高'];
             const breakfastValue = Number(globalData.朝食の栄養カバレッジ);
-            const breakfastScore = scoreFormatters['朝食の栄養カバレッジ'](globalData.朝食の栄養カバレッジ);
-            document.getElementById('breakfast-level').textContent = `${breakfastLevels[breakfastValue]} (${breakfastScore}点)`;
+            document.getElementById('breakfast-level').textContent = breakfastLevels[breakfastValue];
             document.getElementById('breakfast-progress').style.width = `${(breakfastValue / 3) * 100}%`;
             
             const asukenScore = globalData.あすけん || 0;
-            document.getElementById('asuken-score').textContent = `${asukenScore}点`;
+            document.getElementById('asuken-score').textContent = asukenScore;
             document.getElementById('asuken-gauge').style.width = `${asukenScore}%`;
             
             // 4. 仕事
             const workDisplay = document.getElementById('work-display');
-            const workScore = scoreFormatters['労働'](globalData.労働);
             if (globalData.労働.状態 === '休日') {
                 workDisplay.innerHTML = `
                     <div class="work-status" style="color: #2ecc71;">休日</div>
                     <div style="font-size: 14px; color: #888;">お疲れ様でした</div>
-                    <div style="margin-top: 8px; font-size: 16px; color: #3498db; font-weight: bold;">${workScore}点</div>
                 `;
             } else {
                 workDisplay.innerHTML = `
@@ -696,14 +767,12 @@
                             <div class="work-metric-label">Discipline</div>
                         </div>
                     </div>
-                    <div style="margin-top: 8px; font-size: 16px; color: #3498db; font-weight: bold;">${workScore}点</div>
-                    ${globalData.労働.備考 ? `<div style="margin-top: 8px; font-size: 12px; color: #bbb;">${globalData.労働.備考}</div>` : ''}
+                    ${globalData.労働.備考 ? `<div style="margin-top: 12px; font-size: 12px; color: #bbb;">${globalData.労働.備考}</div>` : ''}
                 `;
             }
             
             // 5. 運動
             const gymDisplay = document.getElementById('gym-display');
-            const gymScore = scoreFormatters['ジム'](globalData.ジム);
             const gymLevels = {
                 'サボった': { level: 0, label: 'サボった', icon: '😔' },
                 '休養日': { level: 1, label: '休養日', icon: '😴' },
@@ -714,7 +783,6 @@
             gymDisplay.innerHTML = `
                 <div style="font-size: 36px; margin-bottom: 8px;">${gymInfo.icon}</div>
                 <div class="level-badge level-${gymInfo.level}">${gymInfo.label}</div>
-                <div style="margin-top: 8px; font-size: 16px; color: #3498db; font-weight: bold;">${gymScore}点</div>
             `;
             
             // 6. 学習・成長
@@ -722,8 +790,8 @@
             learningActivities.innerHTML = '';
             
             const learningItems = [
-                { key: '勉強会', icon: '📖', label: '勉強会', active: globalData.勉強会, score: scoreFormatters['勉強会'](globalData.勉強会) },
-                { key: '個人開発', icon: '💻', label: '個人開発', active: globalData.個人開発, score: scoreFormatters['個人開発'](globalData.個人開発) }
+                { key: '勉強会', icon: '📖', label: '勉強会', active: globalData.勉強会 },
+                { key: '個人開発', icon: '💻', label: '個人開発', active: globalData.個人開発 }
             ];
             
             learningItems.forEach(item => {
@@ -732,7 +800,6 @@
                 div.innerHTML = `
                     <div class="icon">${item.icon}</div>
                     <div class="label">${item.label}</div>
-                    <div class="score">${item.score}点</div>
                 `;
                 learningActivities.appendChild(div);
             });
