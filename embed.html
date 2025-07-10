@@ -48,6 +48,10 @@
         
         /* テーブルビュー */
         .table-view {
+            display: none;
+        }
+        
+        .table-view.active {
             display: block;
         }
         
@@ -101,6 +105,10 @@
         /* ダッシュボードビュー */
         .dashboard-view {
             display: none;
+        }
+        
+        .dashboard-view.active {
+            display: block;
         }
         
         .dashboard-grid {
@@ -169,11 +177,11 @@
         <button id="dashboard-btn" class="active" onclick="showView('dashboard')">ダッシュボード</button>
     </div>
     
-    <div id="table-view" class="table-view" style="display: none;">
+    <div id="table-view" class="table-view">
         <div id="result-container"></div>
     </div>
     
-    <div id="dashboard-view" class="dashboard-view" style="display: block;">
+    <div id="dashboard-view" class="dashboard-view active">
         <div class="score-display">
             <div class="score-value" id="total-score">--</div>
             <div class="score-label">総合スコア</div>
@@ -297,13 +305,13 @@
             const dashboardBtn = document.getElementById('dashboard-btn');
             
             if (view === 'table') {
-                tableView.style.display = 'block';
-                dashboardView.style.display = 'none';
+                tableView.classList.add('active');
+                dashboardView.classList.remove('active');
                 tableBtn.classList.add('active');
                 dashboardBtn.classList.remove('active');
             } else {
-                tableView.style.display = 'none';
-                dashboardView.style.display = 'block';
+                tableView.classList.remove('active');
+                dashboardView.classList.add('active');
                 tableBtn.classList.remove('active');
                 dashboardBtn.classList.add('active');
                 
