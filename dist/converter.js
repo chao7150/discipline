@@ -152,6 +152,7 @@ export function convertData(data) {
     const totalScore = Math.round(scores.reduce((sum, score) => sum + score, 0) / totalWeight);
     return {
         markdown: convertToMarkdown(formattedData, totalScore, weights, totalWeight),
+        totalScore: totalScore
     };
 }
 /**
